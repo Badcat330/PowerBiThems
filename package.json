@@ -10,14 +10,14 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:power-bi-thems-extension.helloWorld"
+		"*"
 	],
 	"main": "./extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "power-bi-thems-extension.helloWorld",
-				"title": "Hello World"
+				"command": "power-bi-thems-extension.AlternativeVisualizers",
+				"title": "Alternative Visualizers"
 			}
 		]
 	},
