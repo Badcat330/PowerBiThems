@@ -12,14 +12,38 @@
 	"activationEvents": [
 		"*"
 	],
-	"main": "./extension.js",
+	"main": "./src/extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "power-bi-thems-extension.AlternativeVisualizers",
 				"title": "Alternative Visualizers"
+			},
+			{
+				"command": "power-bi-thems-extension.DbConnection",
+				"title": "Connect DB"
 			}
-		]
+		],
+		"configuration": {
+			"title": "Power BI Themes",
+			"properties": {
+				"power-bi-thems-extension.Host": {
+					"type": "string",
+					"default": "thems.database.windows.net",
+					"description": "Host of data base connection"
+				},
+				"power-bi-thems-extension.Port": {
+					"type": "integer",
+					"default": 1433,
+					"description": "Port for data base connection"
+				},
+				"power-bi-thems-extension.Name": {
+					"type": "string",
+					"default": "thems_storage",
+					"description": "Name of data base you would like to connect"
+				}
+			}
+		}
 	},
 	"scripts": {
 		"lint": "eslint .",
@@ -36,5 +60,8 @@
 		"mocha": "^7.1.2",
 		"typescript": "^3.8.3",
 		"vscode-test": "^1.3.0"
+	},
+	"dependencies": {
+		"tedious": "^6.14.4"
 	}
 }
