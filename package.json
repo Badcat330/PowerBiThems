@@ -19,7 +19,32 @@
 				"command": "power-bi-thems-extension.AlternativeVisualizers",
 				"title": "Alternative Visualizers"
 			}
-		]
+		],
+		"configuration": {
+			"title": "Power BI Themes",
+			"properties": {
+				"power-bi-thems-extension.Host": {
+					"type": "string",
+					"default": "thems.database.windows.net",
+					"description": "Host of data base connection"
+				},
+				"power-bi-thems-extension.Port": {
+					"type": "integer",
+					"default": 1433,
+					"description": "Port for data base connection"
+				},
+				"power-bi-thems-extension.Name": {
+					"type": "string",
+					"default": "thems_storage",
+					"description": "Name of data base you would like to connect"
+				},
+				"power-bi-thems-extension.UserName": {
+					"type": "string",
+					"default": "",
+					"description": "Your user name in data base"
+				}
+			}
+		}
 	},
 	"scripts": {
 		"lint": "eslint .",
