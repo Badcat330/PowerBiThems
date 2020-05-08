@@ -39,8 +39,17 @@ function activate(context) {
 		dbConnector.createConnection(name, pass)
 	});
 
+	let addTag = vscode.commands.registerCommand("power-bi-thems-extension.AddTag", async function () {
+		let input = await vscode.window.showInputBox({
+			placeHolder: "Add tag name",
+			ignoreFocusOut: true
+		})
+		dbConnector.addTag(input)
+	});
+
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(connect)
+	context.subscriptions.push(addTag)
 }
 exports.activate = activate;
 
