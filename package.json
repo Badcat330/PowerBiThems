@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*"
+		"onCommand:power-bi-thems-extension.DbConnection"
 	],
 	"main": "./src/extension.js",
 	"contributes": {
@@ -22,6 +22,10 @@
 			{
 				"command": "power-bi-thems-extension.DbConnection",
 				"title": "Connect DB"
+			},
+			{
+				"command": "power-bi-thems-extension.AddTag",
+				"title": "Add tag"
 			}
 		],
 		"configuration": {
