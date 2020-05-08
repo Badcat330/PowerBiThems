@@ -47,9 +47,14 @@ function activate(context) {
 		dbConnector.addTag(input)
 	});
 
+	let renameTag = vscode.commands.registerCommand("power-bi-thems-extension.RenameTag", async function () {
+		dbConnector.renameTag()
+	});
+
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(connect)
 	context.subscriptions.push(addTag)
+	context.subscriptions.push(renameTag)
 }
 exports.activate = activate;
 

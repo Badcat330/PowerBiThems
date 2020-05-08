@@ -26,6 +26,10 @@
 			{
 				"command": "power-bi-thems-extension.AddTag",
 				"title": "Add tag"
+			},
+			{
+				"command": "power-bi-thems-extension.RenameTag",
+				"title": "Rename tag"
 			}
 		],
 		"configuration": {
