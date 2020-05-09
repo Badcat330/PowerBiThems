@@ -56,21 +56,19 @@ function activate(context) {
 		dbConnector.deleteTag()
 	});
 
-	let visualize = vscode.commands.registerCommand("power-bi-thems-extension.Visualize", async function(){
+	let visualize = vscode.commands.registerCommand("power-bi-thems-extension.Visualize", async function () {
 		const pathConfig = vscode.workspace.getConfiguration('power-bi-thems-extension').get("PowerBiPath")
-		if(pathConfig == "")
-		{
+		if (pathConfig == "") {
 			const input = vscode.window.showOpenDialog({
-				filters : {
-					"Power BI" : ['pbix']
+				filters: {
+					"Power BI": ['pbix']
 				},
-				openLabel : "Open Test"
+				openLabel: "Open Test"
 			})
 
-			Promise.resolve(input).then(function(inputPath){
-				cp.exec(inputPath[0].path.substring(1, inputPath[0].path.length), function(err){
-					if(err)
-					{
+			Promise.resolve(input).then(function (inputPath) {
+				cp.exec(inputPath[0].path.substring(1, inputPath[0].path.length), function (err) {
+					if (err) {
 						console.log(err)
 						vscode.window.showErrorMessage("Your path should be with ASCII symbols and without spaces")
 					}
@@ -80,11 +78,9 @@ function activate(context) {
 				})
 			})
 		}
-		else
-		{
-			cp.exec(pathConfig , function(err){
-				if(err)
-				{
+		else {
+			cp.exec(pathConfig, function (err) {
+				if (err) {
 					console.log(err)
 					vscode.window.showErrorMessage("Your path should be with ASCII symbols and without spaces")
 				}
