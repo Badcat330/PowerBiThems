@@ -30,6 +30,10 @@
 			{
 				"command": "power-bi-thems-extension.RenameTag",
 				"title": "Rename tag"
+			},
+			{
+				"command": "power-bi-thems-extension.DeleteTag",
+				"title": "Delete tag"
 			}
 		],
 		"configuration": {

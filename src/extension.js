@@ -51,10 +51,15 @@ function activate(context) {
 		dbConnector.renameTag()
 	});
 
+	let deleteTag = vscode.commands.registerCommand("power-bi-thems-extension.DeleteTag", async function () {
+		dbConnector.deleteTag()
+	});
+
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(connect)
 	context.subscriptions.push(addTag)
 	context.subscriptions.push(renameTag)
+	context.subscriptions.push(deleteTag)
 }
 exports.activate = activate;
 
