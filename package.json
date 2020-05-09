@@ -10,6 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
+		"*",
 		"onCommand:power-bi-thems-extension.DbConnection"
 	],
 	"main": "./src/extension.js",
@@ -34,6 +35,10 @@
 			{
 				"command": "power-bi-thems-extension.DeleteTag",
 				"title": "Delete tag"
+			},
+			{
+				"command": "power-bi-thems-extension.Visualize",
+				"title": "Visualize"
 			}
 		],
 		"configuration": {
@@ -53,6 +58,11 @@
 					"type": "string",
 					"default": "thems_storage",
 					"description": "Name of data base you would like to connect"
+				},
+				"power-bi-thems-extension.PowerBiPath": {
+					"type": "string",
+					"default": "",
+					"description": "Path to test report"
 				}
 			}
 		}
@@ -74,6 +84,7 @@
 		"vscode-test": "^1.3.0"
 	},
 	"dependencies": {
-		"tedious": "^8.3.0"
+		"tedious": "^8.3.0",
+		"node-powershell": "4.0.0"
 	}
 }
