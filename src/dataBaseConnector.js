@@ -26,6 +26,7 @@ const createConnection = function (userNameGiven, userPasswordGiven) {
 
     connection.on("connect", err => {
         if (err) {
+            console.log(err);
             vscode.window.showErrorMessage(err.message);
         } else {
             vscode.window.showInformationMessage("Successful connection")
@@ -40,6 +41,7 @@ const addTag = function (name) {
         "else THROW 50000, 'The record already exist.', 1;",
         function (err) {
             if (err) {
+                console.log(err)
                 vscode.window.showErrorMessage(err.message)
             }
             else {
@@ -55,6 +57,7 @@ const renameTag = function () {
     var getTagsRequest = new Request("SELECT id, name, date_creation FROM tag_current",
         (err, rowCount, rows) => {
             if (err) {
+                console.log(err);
                 vscode.window.showErrorMessage("Something wrong with your database connection!")
                 return
             }
@@ -67,12 +70,11 @@ const renameTag = function () {
 
             let choosenTag = vscode.window.showQuickPick(tags,
                 {
-                    placeHolder: "Choose tag",
-                    ignoreFocusOut: true,
+                    placeHolder: "Choose tag"
                 })
 
             var changeNameRequest = new Request("INSERT INTO tag_version (id, id_current, name, date_creation, date_update)" +
-                "VALUES (NEWID(), @id, @oldName, @creationData, getdate());" +
+                "VALUES (NEWID(), @id, @oldName, @creationData, getdate())" +
                 "UPDATE tag_current SET name = @newName, date_update = getdate()" +
                 "WHERE id = @id",
                 (err) => {
@@ -107,12 +109,75 @@ const renameTag = function () {
     connection.execSql(getTagsRequest);
 }
 
+const deleteTag = function () {
+    var getTagsRequest = new Request("SELECT id, name, date_creation FROM tag_current",
+        (err, rowCount, rows) => {
+            if (err) {
+                console.log(err);
+                vscode.window.showErrorMessage("Something wrong with your database connection!")
+                return
+            }
+
+            var tags = [];
+
+            for (var i = 0; i < rowCount; i++) {
+                tags.push(String(rows[i][1].value))
+            }
+
+            let choosenTag = vscode.window.showQuickPick(tags,
+                {
+                    placeHolder: "Choose tag"
+                })
+
+            var deleteTagRequest = new Request("INSERT INTO tag_version (id, id_current, name, date_creation," +
+                "date_update, date_delete)" +
+                "VALUES (NEWID(), null, @name, @creationData, getdate(), getdate())" +
+                "UPDATE tag_version SET id_current = null WHERE id_current = @id " +
+                "DELETE FROM tag_current WHERE id = @id",
+                (err) => {
+                    if (err) {
+                        vscode.window.showErrorMessage("Something wrong with your database connection!")
+                        console.log(err);
+                    }
+                    else {
+                        vscode.window.showInformationMessage("Tag was deleted")
+                    }
+                });
+
+            Promise.resolve(choosenTag).then(function (value) {
+
+                var input = vscode.window.showQuickPick(["Yes", "No"], {
+                    placeHolder: "Are you shure?",
+                    ignoreFocusOut: true
+                })
+
+                Promise.resolve(input).then(function (answer) {
+                    if (answer == "Yes") {
+                        var index = tags.findIndex(item => item == value)
+                        deleteTagRequest.addParameter("name", TYPES.Text, value)
+                        deleteTagRequest.addParameter("id", TYPES.UniqueIdentifier, rows[index][0].value)
+                        deleteTagRequest.addParameter("creationData", TYPES.DateTime, rows[index][2].value)
+                        connection.execSql(deleteTagRequest);
+                    }
+                    else {
+                        vscode.window.showInformationMessage("Operation canceled.")
+                    }
+                })
+            })
+
+        });
+
+    connection.execSql(getTagsRequest);
+}
+
 module.exports.createConnection = createConnection;
 module.exports.addTag = addTag;
 module.exports.renameTag = renameTag
+module.exports.deleteTag = deleteTag
 
 module.exports = {
     createConnection,
     addTag,
-    renameTag
+    renameTag,
+    deleteTag
 }
