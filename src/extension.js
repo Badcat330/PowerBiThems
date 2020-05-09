@@ -1,7 +1,6 @@
 const vscode = require('vscode');
 const dbConnector = require('./dataBaseConnector')
 var cp = require('child_process');
-const fs = require('fs')
 
 const alternativeVisualizersLinks = {
 	"Theme Generator": 'https://powerbi.tips/tools/report-theme-generator-v3/',
@@ -73,7 +72,7 @@ function activate(context) {
 					if(err)
 					{
 						console.log(err)
-						vscode.window.showErrorMessage(err.message)
+						vscode.window.showErrorMessage("Your path should be with ASCII symbols and without spaces")
 					}
 					else
 						vscode.window.showInformationMessage("If you want set default path for test file, you can do it in settings!")
@@ -87,7 +86,7 @@ function activate(context) {
 				if(err)
 				{
 					console.log(err)
-					vscode.window.showErrorMessage(err.message)
+					vscode.window.showErrorMessage("Your path should be with ASCII symbols and without spaces")
 				}
 			})
 		}
