@@ -73,7 +73,8 @@ function activate(context) {
 						vscode.window.showErrorMessage("Your path should be with ASCII symbols and without spaces")
 					}
 					else
-						vscode.window.showInformationMessage("If you want set default path for test file, you can do it in settings!")
+						vscode.window.showInformationMessage("If you want set default path for test file," +
+							" you can do it in settings!")
 
 				})
 			})
