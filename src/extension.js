@@ -1,5 +1,7 @@
 const vscode = require('vscode');
 const dbConnector = require('./dataBaseConnector')
+var cp = require('child_process');
+const fs = require('fs')
 
 const alternativeVisualizersLinks = {
 	"Theme Generator": 'https://powerbi.tips/tools/report-theme-generator-v3/',
@@ -55,11 +57,48 @@ function activate(context) {
 		dbConnector.deleteTag()
 	});
 
+	let visualize = vscode.commands.registerCommand("power-bi-thems-extension.Visualize", async function(){
+		const pathConfig = vscode.workspace.getConfiguration('power-bi-thems-extension').get("PowerBiPath")
+		if(pathConfig == "")
+		{
+			const input = vscode.window.showOpenDialog({
+				filters : {
+					"Power BI" : ['pbix']
+				},
+				openLabel : "Open Test"
+			})
+
+			Promise.resolve(input).then(function(inputPath){
+				cp.exec(inputPath[0].path.substring(1, inputPath[0].path.length), function(err){
+					if(err)
+					{
+						console.log(err)
+						vscode.window.showErrorMessage(err.message)
+					}
+					else
+						vscode.window.showInformationMessage("If you want set default path for test file, you can do it in settings!")
+
+				})
+			})
+		}
+		else
+		{
+			cp.exec(pathConfig , function(err){
+				if(err)
+				{
+					console.log(err)
+					vscode.window.showErrorMessage(err.message)
+				}
+			})
+		}
+	});
+
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(connect)
 	context.subscriptions.push(addTag)
 	context.subscriptions.push(renameTag)
 	context.subscriptions.push(deleteTag)
+	context.subscriptions.push(visualize)
 }
 exports.activate = activate;
 
