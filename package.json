@@ -18,27 +18,27 @@
 		"commands": [
 			{
 				"command": "power-bi-thems-extension.AlternativeVisualizers",
-				"title": "Alternative Visualizers"
+				"title": "BIS: Alternative Visualizers"
 			},
 			{
 				"command": "power-bi-thems-extension.DbConnection",
-				"title": "Connect DB"
+				"title": "BIS: Connect data base"
 			},
 			{
 				"command": "power-bi-thems-extension.AddTag",
-				"title": "Add tag"
+				"title": "BIS: Create tag"
 			},
 			{
 				"command": "power-bi-thems-extension.RenameTag",
-				"title": "Rename tag"
+				"title": "BIS: Rename tag"
 			},
 			{
 				"command": "power-bi-thems-extension.DeleteTag",
-				"title": "Delete tag"
+				"title": "BIS: Delete tag"
 			},
 			{
 				"command": "power-bi-thems-extension.Visualize",
-				"title": "Visualize"
+				"title": "BIS: Visualize"
 			}
 		],
 		"configuration": {

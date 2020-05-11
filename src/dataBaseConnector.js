@@ -1,5 +1,6 @@
 const { Connection, Request, TYPES } = require("tedious");
 const vscode = require('vscode');
+const scriptsSQL = require('./ScriptsSQL')
 
 let connection = null
 
@@ -35,10 +36,7 @@ const createConnection = function (userNameGiven, userPasswordGiven) {
 }
 
 const addTag = function (name) {
-    var request = new Request("if NOT EXISTS(SELECT id FROM tag_current WHERE name like @name)" +
-        "INSERT INTO tag_current (id, name, date_creation, date_update)" +
-        "VALUES (NEWID(), @name, getdate(), getdate())" +
-        "else THROW 50000, 'The record already exist.', 1;",
+    var request = new Request(scriptsSQL.createTag,
         function (err) {
             if (err) {
                 console.log(err)
@@ -54,7 +52,7 @@ const addTag = function (name) {
 
 const renameTag = function () {
 
-    var getTagsRequest = new Request("SELECT id, name, date_creation FROM tag_current",
+    var getTagsRequest = new Request(scriptsSQL.getTags,
         (err, rowCount, rows) => {
             if (err) {
                 console.log(err);
@@ -73,9 +71,7 @@ const renameTag = function () {
                     placeHolder: "Choose tag"
                 })
 
-            var changeNameRequest = new Request("INSERT INTO tag_version (id, id_current, name, date_creation, date_update)" +
-                "VALUES (NEWID(), @id, @oldName, @creationData, getdate())" +
-                "UPDATE tag_current SET name = @newName, date_update = getdate()" +
+            var changeNameRequest = new Request(scriptsSQL.renameTag +
                 "WHERE id = @id",
                 (err) => {
                     if (err) {
@@ -110,7 +106,7 @@ const renameTag = function () {
 }
 
 const deleteTag = function () {
-    var getTagsRequest = new Request("SELECT id, name, date_creation FROM tag_current",
+    var getTagsRequest = new Request(scriptsSQL.getTags,
         (err, rowCount, rows) => {
             if (err) {
                 console.log(err);
@@ -129,11 +125,7 @@ const deleteTag = function () {
                     placeHolder: "Choose tag"
                 })
 
-            var deleteTagRequest = new Request("INSERT INTO tag_version (id, id_current, name, date_creation," +
-                "date_update, date_delete)" +
-                "VALUES (NEWID(), null, @name, @creationData, getdate(), getdate())" +
-                "UPDATE tag_version SET id_current = null WHERE id_current = @id " +
-                "DELETE FROM tag_current WHERE id = @id",
+            var deleteTagRequest = new Request(scriptsSQL.deleteTag,
                 (err) => {
                     if (err) {
                         vscode.window.showErrorMessage("Something wrong with your database connection!")
