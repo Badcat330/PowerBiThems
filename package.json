@@ -49,10 +49,10 @@
 					"default": "thems.database.windows.net",
 					"description": "Host of data base connection"
 				},
-				"power-bi-thems-extension.Port": {
-					"type": "integer",
-					"default": 1433,
-					"description": "Port for data base connection"
+				"power-bi-thems-extension.UserName": {
+					"type": "string",
+					"default": "",
+					"description": "User name for data base connection"
 				},
 				"power-bi-thems-extension.Name": {
 					"type": "string",
