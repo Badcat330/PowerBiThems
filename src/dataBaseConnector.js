@@ -71,8 +71,7 @@ const renameTag = function () {
                     placeHolder: "Choose tag"
                 })
 
-            var changeNameRequest = new Request(scriptsSQL.renameTag +
-                "WHERE id = @id",
+            var changeNameRequest = new Request(scriptsSQL.renameTag,
                 (err) => {
                     if (err) {
                         vscode.window.showErrorMessage("Something wrong with your database connection!")
