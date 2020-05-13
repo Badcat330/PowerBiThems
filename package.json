@@ -59,10 +59,15 @@
 					"default": "thems_storage",
 					"description": "Name of data base you would like to connect"
 				},
-				"power-bi-thems-extension.PowerBiPath": {
+				"power-bi-thems-extension.NormativeTestPath": {
 					"type": "string",
 					"default": "",
-					"description": "Path to test report"
+					"description": "Path to test normative report"
+				},
+				"power-bi-thems-extension.CastomTestPath": {
+					"type": "string",
+					"default": "",
+					"description": "Path to test castom report"
 				}
 			}
 		}
