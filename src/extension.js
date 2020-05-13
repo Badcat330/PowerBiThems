@@ -80,7 +80,6 @@ function activate(context) {
 					else
 						vscode.window.showInformationMessage("If you want set default path for test file," +
 							" you can do it in settings!")
-
 				})
 			})
 		}
@@ -94,12 +93,48 @@ function activate(context) {
 		}
 	});
 
+	let saveFile = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.SaveFile",
+		async function (editor, edit) {
+			const text = editor.document.getText()
+
+			// ToDo Hendel exeption 
+			var style = JSON.parse(text)
+
+			if (!style.hasOwnProperty("visualStyles")) {
+				style["visualStyles"] = {
+					"[18FA64C3-45E0-488A-ADB7-A4D37842CB93]": {
+						"*": {
+							"Id": "",
+							"Tag": [""]
+						}
+					}
+				};
+			}
+			else {
+				style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"] = {
+					"*": {
+						"Id": "",
+						"Tag": [""]
+					}
+				}
+			}
+			const newText = JSON.stringify(style, null, '\t')
+			var firstLine = editor.document.lineAt(0);
+			var lastLine = editor.document.lineAt(editor.document.lineCount - 1);
+			var textRange = new vscode.Range(0,
+				firstLine.range.start.character,
+				editor.document.lineCount - 1,
+				lastLine.range.end.character);
+			edit.replace(textRange, newText)
+		});
+
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(connect)
 	context.subscriptions.push(addTag)
 	context.subscriptions.push(renameTag)
 	context.subscriptions.push(deleteTag)
 	context.subscriptions.push(visualize)
+	context.subscriptions.push(saveFile)
 }
 exports.activate = activate;
 
