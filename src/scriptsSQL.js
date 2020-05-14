@@ -47,16 +47,21 @@ const createFile = "DECLARE @new_id_file UNIQUEIDENTIFIER "+
 "INSERT file_current (id, userId, userName, name, data, date_creation, date_update) "+
   "VALUES (@new_id_file, USER_ID(@user), @user, @name, @data, GETDATE(), GETDATE()) "+
 "INSERT file_version (id, id_file_current, userID, userName, name, data, date_creation, date_update) "+
-  "VALUES (NEWID(), @new_id_file, USER_ID(@user), @user, @name, @data, GETDATE(),GETDATE()) "
+  "VALUES (NEWID(), @new_id_file, USER_ID(@user), @user, @name, @data, GETDATE(),GETDATE()) " +
+"SELECT @new_id_file, GETDATE(), @name"
 
 const saveFile = "DECLARE @new_id UNIQUEIDENTIFIER " +
 "SET @new_id = NEWID() " +
+"DECLARE @data NVARCHAR(MAX) "+
+"DECLARE @name NVARCHAR(MAX) " +
+"DECLARE @data_creation DATETIME " +
+"SELECT @data = data, @name = name, @data_creation = date_creation FROM file_current WHERE id = @id " +
 "INSERT INTO file_version (id, id_file_current, userID, userName, name, data, date_creation, date_update) "+
   "VALUES (@new_id, @id, USER_ID(@user), @user, @name, @data, @data_creation, GETDATE()) "+
 "DECLARE @id_last_version UNIQUEIDENTIFIER; "+
 "SELECT @id_last_version = id FROM file_version WHERE id_file_current = @id AND date_update = (SELECT MAX(date_update) FROM file_version WHERE id_file_current = @id); "+
 "INSERT INTO file_tag_version SELECT id_tag_version, @new_id FROM file_tag_version WHERE id_file_version = @id_last_version "+
-"UPDATE file_current SET name = @ew_name, data = @new_data, userId = USER_ID(@user), userName= @user, date_update = getdate() WHERE id = @id;"
+"UPDATE file_current SET name = @new_name, data = @new_data, userId = USER_ID(@user), userName= @user, date_update = getdate() WHERE id = @id;"
 
 const deleFile = "DECLARE @new_id UNIQUEIDENTIFIER " +
 "SET @new_id = NEWID() " +

@@ -197,14 +197,63 @@ const deleteTag = function () {
     connection.execSql(getTagsRequest);
 }
 
+let metadata = JSON.parse('{"*": {"Id": "","Tag": []}}')
+
+const saveFile = async function (editor){
+    const text = editor.document.getText()
+	var style = JSON.parse(text)
+	if (!style.hasOwnProperty("visualStyles") || !style.visualStyles.hasOwnProperty("[18FA64C3-45E0-488A-ADB7-A4D37842CB93]")) {
+        var createfileRequest = new Request(scriptsSQL.createFile,
+            (err, rowCount, rows) => {
+                if (err) {
+                    console.log(err);
+                    vscode.window.showErrorMessage("Something wrong with your database connection!")
+                    return
+                }
+                metadata['*'].Id = rows[0][0].value
+                console.log(metadata)
+                vscode.commands.executeCommand("power-bi-thems-extension.changeMetadata")
+                vscode.window.showInformationMessage("File was  to db")
+        })
+        let user = vscode.workspace.getConfiguration('power-bi-thems-extension').get("UserName")
+        createfileRequest.addParameter("user", TYPES.NVarChar, user)
+        createfileRequest.addParameter("data", TYPES.NVarChar, text)
+        createfileRequest.addParameter("name", TYPES.NVarChar, editor.document.fileName.replace(/^.*[\\\/]/, ''))
+        connection.execSql(createfileRequest);
+    }
+    else
+    {
+        var savefileRequest = new Request(scriptsSQL.saveFile,
+            (err) => {
+                if (err) {
+                    console.log(err);
+                    vscode.window.showErrorMessage("Something wrong with your database connection!")
+                    return
+                }
+                vscode.window.showInformationMessage("File was saved")
+        })
+        let user = vscode.workspace.getConfiguration('power-bi-thems-extension').get("UserName")
+        savefileRequest.addParameter("user", TYPES.NVarChar, user)
+        savefileRequest.addParameter("new_data", TYPES.NVarChar, text)
+        savefileRequest.addParameter("new_name", TYPES.NVarChar, editor.document.fileName.replace(/^.*[\\\/]/, ''))
+        savefileRequest.addParameter("id", TYPES.UniqueIdentifier, style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Id)
+        connection.execSql(savefileRequest);
+    }
+    
+}
+
 module.exports.createConnection = createConnection;
 module.exports.createTag = createTag;
 module.exports.changeTag = changeTag
 module.exports.deleteTag = deleteTag
+module.exports.saveFile = saveFile
+module.exports.metadata = metadata
 
 module.exports = {
     createConnection,
     createTag,
     changeTag,
-    deleteTag
+    deleteTag,
+    saveFile,
+    metadata
 }

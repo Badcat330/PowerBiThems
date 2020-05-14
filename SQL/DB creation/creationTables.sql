@@ -1,8 +1,8 @@
 CREATE TABLE themes.dbo.tag_current (
   id UNIQUEIDENTIFIER NOT NULL
  ,is_normative BIT NULL
- ,user_id INT NULL
- ,user_name NVARCHAR(MAX) NULL
+ ,userID INT NULL
+ ,userName NVARCHAR(MAX) NULL
  ,is_process BIT NULL
  ,name NVARCHAR(MAX) NOT NULL
  ,date_creation DATETIME NOT NULL
@@ -14,8 +14,8 @@ GO
 CREATE TABLE themes.dbo.tag_version (
   id UNIQUEIDENTIFIER NOT NULL
  ,id_tag_current UNIQUEIDENTIFIER NULL
- ,user_id INT NULL
- ,user_name NVARCHAR(MAX) NULL
+ ,userID INT NULL
+ ,userName NVARCHAR(MAX) NULL
  ,is_normative BIT NULL
  ,is_process BIT NULL
  ,name NVARCHAR(MAX) NOT NULL
@@ -32,8 +32,8 @@ GO
 
 CREATE TABLE themes.dbo.file_current (
   id UNIQUEIDENTIFIER NOT NULL
- ,user_id INT NULL
- ,user_name NVARCHAR(MAX) NULL
+ ,userId INT NULL
+ ,userName NVARCHAR(MAX) NULL
  ,name NVARCHAR(MAX) NOT NULL
  ,data NVARCHAR(MAX) NOT NULL
  ,date_creation DATETIME NOT NULL
@@ -45,8 +45,8 @@ GO
 CREATE TABLE themes.dbo.file_version (
   id UNIQUEIDENTIFIER NOT NULL
  ,id_file_current UNIQUEIDENTIFIER NULL
- ,user_id INT NULL
- ,user_name NVARCHAR(MAX) NULL
+ ,userID INT NULL
+ ,userName NVARCHAR(MAX) NULL
  ,name NVARCHAR(MAX) NOT NULL
  ,data NVARCHAR(MAX) NOT NULL
  ,date_creation DATETIME NOT NULL

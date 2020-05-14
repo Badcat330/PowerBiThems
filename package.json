@@ -39,6 +39,14 @@
 			{
 				"command": "power-bi-thems-extension.Visualize",
 				"title": "BIS: Visualize"
+			},
+			{
+				"command": "power-bi-thems-extension.SaveFile",
+				"title": "BIS: Save file"
+			},
+			{
+				"command": "power-bi-thems-extension.changeMetadata",
+				"title": "BSI: Reload metadate"
 			}
 		],
 		"configuration": {

@@ -57,6 +57,31 @@ function activate(context) {
 		dbConnector.deleteTag()
 	});
 
+	let saveFile = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.SaveFile", async function(editor) {
+		dbConnector.saveFile(editor)
+	})
+
+	let changeMetadata = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.changeMetadata", async function(editor, edit) {
+		const text = editor.document.getText()
+		var style = JSON.parse(text)
+		if (!style.hasOwnProperty("visualStyles")) {
+			style["visualStyles"] = {
+				"[18FA64C3-45E0-488A-ADB7-A4D37842CB93]" : dbConnector.metadata
+			};
+		}
+		else {
+			style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"] = dbConnector.metadata
+		}
+		const newText = JSON.stringify(style, null, '\t')
+   		var firstLine = editor.document.lineAt(0);
+    	var lastLine = editor.document.lineAt(editor.document.lineCount - 1);
+    	var textRange = new vscode.Range(0,
+        firstLine.range.start.character,
+        editor.document.lineCount - 1,
+        lastLine.range.end.character);
+    	edit.replace(textRange, newText)
+	})
+
 	let visualize = vscode.commands.registerCommand("power-bi-thems-extension.Visualize", async function () {
 		const pathConfig = vscode.workspace.getConfiguration('power-bi-thems-extension').get("PowerBiPath")
 		if (pathConfig == "") {
@@ -96,6 +121,8 @@ function activate(context) {
 	context.subscriptions.push(changeTag)
 	context.subscriptions.push(deleteTag)
 	context.subscriptions.push(visualize)
+	context.subscriptions.push(saveFile)
+	context.subscriptions.push(changeMetadata)
 }
 exports.activate = activate;
 
