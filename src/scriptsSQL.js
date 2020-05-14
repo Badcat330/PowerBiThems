@@ -4,7 +4,7 @@ const createTag = "if EXISTS(SELECT id FROM tag_current WHERE name like @name) "
 "SET @id = NEWID() "+
 "INSERT INTO tag_current ( id, is_normative, is_process, userId, userName, name, date_creation, date_update) "+
 "VALUES (@id,  @is_normative, @is_process, USER_ID(@user), @user, @name,GETDATE(), GETDATE()) "+
-"INSERT INTO tag_version (id, id_current, name, date_creation, date_update, userID, userName, is_normative, is_process) "+
+"INSERT INTO tag_version (id, id_tag_current, name, date_creation, date_update, userID, userName, is_normative, is_process) "+
 "VALUES (NEWID(), @id, @name, GETDATE(), getdate(), USER_ID(@user), @user, @is_normative, @is_process) "
 
 const renameTag = "DECLARE @id_last_version UNIQUEIDENTIFIER; "+

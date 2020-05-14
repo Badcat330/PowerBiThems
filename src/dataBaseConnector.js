@@ -35,7 +35,20 @@ const createConnection = function (userNameGiven, userPasswordGiven) {
     });
 }
 
-const addTag = function (name) {
+const createTag = async function () {
+    let name = await vscode.window.showInputBox({
+        placeHolder: "Add tag name",
+        ignoreFocusOut: true
+    })
+
+    let user = vscode.workspace.getConfiguration('power-bi-thems-extension').get("UserName")
+    let isNormative = await vscode.window.showQuickPick(["Yes", "No"], {
+        placeHolder: "Is it normative tag?",
+    })
+    let isProcess = await vscode.window.showQuickPick(["Yes", "No"], {
+        placeHolder: "Is it process tag?",
+    })
+
     var request = new Request(scriptsSQL.createTag,
         function (err) {
             if (err) {
@@ -46,7 +59,11 @@ const addTag = function (name) {
                 vscode.window.showInformationMessage("Tag added successfully!")
             }
         });
-    request.addParameter("name", TYPES.Text, name)
+    request.addParameter("name", TYPES.NVarChar, name)
+    request.addParameter("user", TYPES.NVarChar, user)
+    request.addParameter("is_normative", TYPES.Bit, isNormative == "Yes" ? 1 : 0)
+    request.addParameter("is_process", TYPES.Bit, isProcess == "Yes" ? 1 : 0)
+
     connection.execSql(request);
 }
 
@@ -162,13 +179,13 @@ const deleteTag = function () {
 }
 
 module.exports.createConnection = createConnection;
-module.exports.addTag = addTag;
+module.exports.createTag = createTag;
 module.exports.renameTag = renameTag
 module.exports.deleteTag = deleteTag
 
 module.exports = {
     createConnection,
-    addTag,
+    createTag,
     renameTag,
     deleteTag
 }
