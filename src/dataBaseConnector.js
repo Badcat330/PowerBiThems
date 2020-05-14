@@ -63,14 +63,13 @@ const createTag = async function () {
     request.addParameter("user", TYPES.NVarChar, user)
     request.addParameter("is_normative", TYPES.Bit, isNormative == "Yes" ? 1 : 0)
     request.addParameter("is_process", TYPES.Bit, isProcess == "Yes" ? 1 : 0)
-
     connection.execSql(request);
 }
 
-const renameTag = function () {
+const changeTag = async function () {
 
     var getTagsRequest = new Request(scriptsSQL.getTags,
-        (err, rowCount, rows) => {
+        async function (err, rowCount, rows) {
             if (err) {
                 console.log(err);
                 vscode.window.showErrorMessage("Something wrong with your database connection!")
@@ -99,19 +98,35 @@ const renameTag = function () {
                     }
                 });
 
-            Promise.resolve(choosenTag).then(function (value) {
+            Promise.resolve(choosenTag).then(async function (value) {
 
                 var input = vscode.window.showInputBox({
                     placeHolder: "Input new name",
                     ignoreFocusOut: true
                 })
 
-                Promise.resolve(input).then(function (newName) {
+                Promise.resolve(input).then(async function (newName) {
                     var index = tags.findIndex(item => item == value)
-                    changeNameRequest.addParameter("oldName", TYPES.Text, value)
+                    let user = vscode.workspace.getConfiguration('power-bi-thems-extension').get("UserName")
+                    changeNameRequest.addParameter("old_name", TYPES.NVarChar, value)
                     changeNameRequest.addParameter("id", TYPES.UniqueIdentifier, rows[index][0].value)
-                    changeNameRequest.addParameter("newName", TYPES.Text, newName)
-                    changeNameRequest.addParameter("creationData", TYPES.DateTime, rows[index][2].value)
+                    changeNameRequest.addParameter("new_name", TYPES.NVarChar, newName)
+                    changeNameRequest.addParameter("date_creation", TYPES.DateTime, rows[index][2].value)
+                    changeNameRequest.addParameter("user", TYPES.NVarChar, user)
+
+                    let isNormative = await vscode.window.showQuickPick(["Yes", "No"], {
+                        placeHolder: "Is it normative tag?",
+                    })
+
+                    let isProcess = await vscode.window.showQuickPick(["Yes", "No"], {
+                        placeHolder: "Is it process tag?",
+                    })
+
+                    changeNameRequest.addParameter("is_normative", TYPES.Bit, isNormative == "Yes" ? 1 : 0)
+                    changeNameRequest.addParameter("is_process", TYPES.Bit, isProcess == "Yes" ? 1 : 0)
+                    changeNameRequest.addParameter("is_normativeOld", TYPES.Bit, rows[index][3].value)
+                    changeNameRequest.addParameter("is_processOld", TYPES.Bit, rows[index][4].value)
+                   
                     connection.execSql(changeNameRequest);
                 })
             })
@@ -180,12 +195,12 @@ const deleteTag = function () {
 
 module.exports.createConnection = createConnection;
 module.exports.createTag = createTag;
-module.exports.renameTag = renameTag
+module.exports.changeTag = changeTag
 module.exports.deleteTag = deleteTag
 
 module.exports = {
     createConnection,
     createTag,
-    renameTag,
+    changeTag,
     deleteTag
 }

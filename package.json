@@ -29,8 +29,8 @@
 				"title": "BIS: Create tag"
 			},
 			{
-				"command": "power-bi-thems-extension.RenameTag",
-				"title": "BIS: Rename tag"
+				"command": "power-bi-thems-extension.changeTag",
+				"title": "BIS: Change tag"
 			},
 			{
 				"command": "power-bi-thems-extension.DeleteTag",

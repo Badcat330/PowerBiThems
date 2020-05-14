@@ -49,8 +49,8 @@ function activate(context) {
 		dbConnector.createTag()
 	});
 
-	let renameTag = vscode.commands.registerCommand("power-bi-thems-extension.RenameTag", async function () {
-		dbConnector.renameTag()
+	let changeTag = vscode.commands.registerCommand("power-bi-thems-extension.changeTag", async function () {
+		dbConnector.changeTag()
 	});
 
 	let deleteTag = vscode.commands.registerCommand("power-bi-thems-extension.DeleteTag", async function () {
@@ -93,7 +93,7 @@ function activate(context) {
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(connect)
 	context.subscriptions.push(createTag)
-	context.subscriptions.push(renameTag)
+	context.subscriptions.push(changeTag)
 	context.subscriptions.push(deleteTag)
 	context.subscriptions.push(visualize)
 }

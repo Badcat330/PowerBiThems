@@ -12,9 +12,10 @@ const renameTag = "DECLARE @id_last_version UNIQUEIDENTIFIER; "+
 "DECLARE @new_id UNIQUEIDENTIFIER " +
 "SET @new_id = NEWID() "+
 "INSERT INTO tag_version (id, id_tag_current, name, date_creation, date_update, userID, userName, is_normative, is_process) "+
-  "VALUES (@new_id, @id, @old_name, @date_creation, getdate(), USER_ID(@user), @user, @is_normative, @is_process); " +
+  "VALUES (@new_id, @id, @old_name, @date_creation, getdate(), USER_ID(@user), @user, @is_normativeOld, @is_processOld); " +
 "INSERT INTO file_tag_version SELECT @new_id, id_file_version FROM file_tag_version WHERE id_tag_version = @id_last_version "+
-"UPDATE tag_current SET name = @new_name, date_update = getdate(), userId = USER_ID(@user), userName= @user WHERE id = @id;"
+"UPDATE tag_current SET name = @new_name, date_update = getdate(), userId = USER_ID(@user), userName= @user, is_normative = @is_normative, is_process = @is_process"
+"WHERE id = @id;"
 
 const getTags = "SELECT id, name, date_creation, is_normative, is_process FROM tag_current"
 
