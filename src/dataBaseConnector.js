@@ -177,9 +177,13 @@ const deleteTag = function () {
                 Promise.resolve(input).then(function (answer) {
                     if (answer == "Yes") {
                         var index = tags.findIndex(item => item == value)
-                        deleteTagRequest.addParameter("name", TYPES.Text, value)
+                        let user = vscode.workspace.getConfiguration('power-bi-thems-extension').get("UserName")
+                        deleteTagRequest.addParameter("name", TYPES.NVarChar, value)
                         deleteTagRequest.addParameter("id", TYPES.UniqueIdentifier, rows[index][0].value)
-                        deleteTagRequest.addParameter("creationData", TYPES.DateTime, rows[index][2].value)
+                        deleteTagRequest.addParameter("date_creation", TYPES.DateTime, rows[index][2].value)
+                        deleteTagRequest.addParameter("is_normative", TYPES.Bit, rows[index][3].value)
+                        deleteTagRequest.addParameter("is_process", TYPES.Bit, rows[index][4].value)
+                        deleteTagRequest.addParameter("user", TYPES.NVarChar, user)
                         connection.execSql(deleteTagRequest);
                     }
                     else {

@@ -24,7 +24,7 @@ const deleteTag = "DECLARE @id_last_version UNIQUEIDENTIFIER; "+
 "DECLARE @new_id UNIQUEIDENTIFIER " +
 "SET @new_id = NEWID() "+
 "INSERT INTO tag_version (id, id_tag_current, name, date_creation, date_update, userID, userName, is_normative, is_process, date_delete) "+
-  "VALUES (@new_id, @id, @old_name, @date_creation, getdate(), USER_ID(@user), @user, @is_normative, @is_process, getdate()); " +
+  "VALUES (@new_id, @id, @name, @date_creation, getdate(), USER_ID(@user), @user, @is_normative, @is_process, getdate()); " +
 "INSERT INTO file_tag_version SELECT @new_id, id_file_version FROM file_tag_version WHERE id_tag_version = @id_last_version "+
 "DELETE FROM tag_current WHERE id = @id"
 
