@@ -18,27 +18,27 @@
 		"commands": [
 			{
 				"command": "power-bi-thems-extension.AlternativeVisualizers",
-				"title": "Alternative Visualizers"
+				"title": "BIS: Alternative Visualizers"
 			},
 			{
 				"command": "power-bi-thems-extension.DbConnection",
-				"title": "Connect DB"
+				"title": "BIS: Connect data base"
 			},
 			{
 				"command": "power-bi-thems-extension.AddTag",
-				"title": "Add tag"
+				"title": "BIS: Create tag"
 			},
 			{
 				"command": "power-bi-thems-extension.RenameTag",
-				"title": "Rename tag"
+				"title": "BIS: Rename tag"
 			},
 			{
 				"command": "power-bi-thems-extension.DeleteTag",
-				"title": "Delete tag"
+				"title": "BIS: Delete tag"
 			},
 			{
 				"command": "power-bi-thems-extension.Visualize",
-				"title": "Visualize"
+				"title": "BIS: Visualize"
 			}
 		],
 		"configuration": {
@@ -49,20 +49,25 @@
 					"default": "thems.database.windows.net",
 					"description": "Host of data base connection"
 				},
-				"power-bi-thems-extension.Port": {
-					"type": "integer",
-					"default": 1433,
-					"description": "Port for data base connection"
+				"power-bi-thems-extension.UserName": {
+					"type": "string",
+					"default": "",
+					"description": "User name for data base connection"
 				},
 				"power-bi-thems-extension.Name": {
 					"type": "string",
 					"default": "thems_storage",
 					"description": "Name of data base you would like to connect"
 				},
-				"power-bi-thems-extension.PowerBiPath": {
+				"power-bi-thems-extension.NormativeTestPath": {
 					"type": "string",
 					"default": "",
-					"description": "Path to test report"
+					"description": "Path to test normative report"
+				},
+				"power-bi-thems-extension.CastomTestPath": {
+					"type": "string",
+					"default": "",
+					"description": "Path to test castom report"
 				}
 			}
 		}

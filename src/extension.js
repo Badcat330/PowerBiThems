@@ -28,10 +28,15 @@ function activate(context) {
 	});
 
 	let connect = vscode.commands.registerCommand("power-bi-thems-extension.DbConnection", async function () {
-		let name = await vscode.window.showInputBox({
-			placeHolder: "Input your user name here",
-			ignoreFocusOut: true
-		})
+		var name = vscode.workspace.getConfiguration("power-bi-thems-extension").get("UserName")
+		if (name == "") {
+			name = await vscode.window.showInputBox({
+				placeHolder: "Input your user name here",
+				ignoreFocusOut: true
+			})
+			vscode.workspace.getConfiguration("power-bi-thems-extension").update("UserName", String(name))
+			vscode.window.showInformationMessage("Your username successfully saved")
+		}
 		let pass = await vscode.window.showInputBox({
 			placeHolder: "Input your password here",
 			ignoreFocusOut: true,
