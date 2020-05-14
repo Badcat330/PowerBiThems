@@ -8,9 +8,9 @@ create table tag_current
 	id uniqueidentifier
 		constraint tag_current_pk
 			primary key nonclustered,
-	user_id int,
-	user_name nvarchar(max),
 	isNormative bit,
+	userId int,
+	userName nvarchar(max),
     isProcess bit,
 	name nvarchar(max) not null,
 	date_creation datetime not null,
@@ -25,8 +25,8 @@ create table tag_version
 	id_current uniqueidentifier
 	    constraint id_tag_current
 			references tag_current,
-	user_id int,
-	user_name nvarchar(max),
+	userId int,
+	userName nvarchar(max),
 	isNormative bit,
     isProcess bit,
 	name nvarchar(max) not null,
@@ -43,8 +43,8 @@ create table file_current
 	id_tag uniqueidentifier
 		constraint id_tag
 		     references tag_current,
-	user_id int,
-	user_name nvarchar(max),
+	userId int,
+	userName nvarchar(max),
 	name nvarchar(max) not null,
 	data nvarchar(max) not null,
 	date_creation datetime not null,
@@ -62,8 +62,8 @@ create table file_version
 	id_tag_version uniqueidentifier
 		constraint id_tag_version
 			references tag_version,
-	user_id int,
-	user_name nvarchar(max),
+	userId int,
+	userName nvarchar(max),
 	name nvarchar(max) not null,
 	data nvarchar(max) not null,
 	date_creation datetime not null,

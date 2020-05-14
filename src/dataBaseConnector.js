@@ -20,7 +20,7 @@ const createConnection = function (userNameGiven, userPasswordGiven) {
         server: host,
         options: {
             database: dbName,
-            encrypt: true,
+            encrypt: false,
             rowCollectionOnRequestCompletion: true
         }
     })
