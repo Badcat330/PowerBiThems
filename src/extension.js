@@ -67,10 +67,10 @@ function activate(context) {
 			})
 
 			Promise.resolve(input).then(function (inputPath) {
-				cp.exec(inputPath[0].path.substring(1, inputPath[0].path.length), function (err) {
+				cp.exec('"' + inputPath[0].path.substring(1, inputPath[0].path.length) + '"', function (err) {
 					if (err) {
 						console.log(err)
-						vscode.window.showErrorMessage("Your path should be with ASCII symbols and without spaces")
+						vscode.window.showErrorMessage("Something wrong with your path, try again")
 					}
 					else
 						vscode.window.showInformationMessage("If you want set default path for test file," +
@@ -80,10 +80,10 @@ function activate(context) {
 			})
 		}
 		else {
-			cp.exec(pathConfig, function (err) {
+			cp.exec('"' + pathConfig + '"', function (err) {
 				if (err) {
 					console.log(err)
-					vscode.window.showErrorMessage("Your path should be with ASCII symbols and without spaces")
+					vscode.window.showErrorMessage("Something wrong with your path, try again")
 				}
 			})
 		}
