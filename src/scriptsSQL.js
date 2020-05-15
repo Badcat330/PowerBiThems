@@ -69,8 +69,12 @@ const saveFile = "DECLARE @new_id UNIQUEIDENTIFIER " +
 
 const deleFile = "DECLARE @new_id UNIQUEIDENTIFIER " +
 "SET @new_id = NEWID() " +
-"INSERT INTO file_version (id, id_file_current, userID, userName, name, data, date_creation, date_update, date_delete) "+
-  "VALUES (@new_id, @id, USER_ID(@user), @user, @name, @data, @data_creation, GETDATE(), GETDATE()) "+
+"DECLARE @data NVARCHAR(MAX) "+
+"DECLARE @name NVARCHAR(MAX) " +
+"DECLARE @data_creation DATETIME " +
+"SELECT @data = data, @name = name, @data_creation = date_creation FROM file_current WHERE id = @id " +
+"INSERT INTO file_version (id, id_file_current, userID, userName, name, data, date_creation, date_update) "+
+  "VALUES (@new_id, @id, USER_ID(@user), @user, @name, @data, @data_creation, GETDATE()) "+
 "DECLARE @id_last_version UNIQUEIDENTIFIER; "+
 "SELECT @id_last_version = id FROM file_version WHERE id_file_current = @id AND date_update = (SELECT MAX(date_update) FROM file_version WHERE id_file_current = @id); "+
 "INSERT INTO file_tag_version SELECT id_tag_version, @new_id FROM file_tag_version WHERE id_file_version = @id_last_version "+

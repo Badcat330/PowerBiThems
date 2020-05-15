@@ -72,7 +72,7 @@ const changeTag = async function () {
         async function (err, rowCount, rows) {
             if (err) {
                 console.log(err);
-                vscode.window.showErrorMessage("Something wrong with your database connection!")
+                vscode.window.showErrorMessage(err.message)
                 return
             }
 
@@ -80,6 +80,12 @@ const changeTag = async function () {
 
             for (var i = 0; i < rowCount; i++) {
                 tags.push(String(rows[i][1].value))
+            }
+
+            if(tags.length == 0)
+            {
+                vscode.showInformationMessage("No tags exist yet")
+                return
             }
 
             let choosenTag = vscode.window.showQuickPick(tags,
@@ -90,7 +96,7 @@ const changeTag = async function () {
             var changeNameRequest = new Request(scriptsSQL.renameTag,
                 (err) => {
                     if (err) {
-                        vscode.window.showErrorMessage("Something wrong with your database connection!")
+                        vscode.window.showErrorMessage(err.message)
                         console.log(err);
                     }
                     else {
@@ -141,7 +147,7 @@ const deleteTag = function () {
         (err, rowCount, rows) => {
             if (err) {
                 console.log(err);
-                vscode.window.showErrorMessage("Something wrong with your database connection!")
+                vscode.window.showErrorMessage(err.message)
                 return
             }
 
@@ -149,6 +155,12 @@ const deleteTag = function () {
 
             for (var i = 0; i < rowCount; i++) {
                 tags.push(String(rows[i][1].value))
+            }
+
+            if(tags.length == 0)
+            {
+                vscode.showInformationMessage("No tags exist yet")
+                return
             }
 
             let choosenTag = vscode.window.showQuickPick(tags,
@@ -159,7 +171,7 @@ const deleteTag = function () {
             var deleteTagRequest = new Request(scriptsSQL.deleteTag,
                 (err) => {
                     if (err) {
-                        vscode.window.showErrorMessage("Something wrong with your database connection!")
+                        vscode.window.showErrorMessage(err.message)
                         console.log(err);
                     }
                     else {
@@ -226,7 +238,7 @@ const saveFile = async function (editor) {
             (err) => {
                 if (err) {
                     console.log(err);
-                    vscode.window.showErrorMessage("Something wrong with your database connection!")
+                    vscode.window.showErrorMessage(err.message)
                     return
                 }
                 vscode.window.showInformationMessage("File was saved")
@@ -251,7 +263,7 @@ const addTag = async function (editor) {
             async function (err) {
                 if (err) {
                     console.log(err);
-                    vscode.window.showErrorMessage("Something wrong with your database connection!")
+                    vscode.window.showErrorMessage(err.message)
                     return
                 }
                 vscode.window.showInformationMessage("Tag added")
@@ -266,7 +278,7 @@ const addTag = async function (editor) {
             async function (err, rowCount, rows) {
                 if (err) {
                     console.log(err);
-                    vscode.window.showErrorMessage("Something wrong with your database connection!")
+                    vscode.window.showErrorMessage(err.message)
                     return
                 }
                 var tags = [];
@@ -278,6 +290,12 @@ const addTag = async function (editor) {
                         tags.push(String(rows[i][1].value))
                     else
                         metadata['*'].Tags.push(String(rows[i][1].value))
+                }
+
+                if(tags.length == 0)
+                {
+                    vscode.showInformationMessage("No tags exist yet")
+                    return
                 }
 
                 let choosenTag = await vscode.window.showQuickPick(tags, {
@@ -311,7 +329,7 @@ const removeTag = async function (editor) {
             async function (err) {
                 if (err) {
                     console.log(err);
-                    vscode.window.showErrorMessage("Something wrong with your database connection!")
+                    vscode.window.showErrorMessage(err.message)
                     return
                 }
 
@@ -320,6 +338,13 @@ const removeTag = async function (editor) {
         )
 
         var addedTags = style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Tags
+
+        if(addedTags.length == 0)
+        {
+            vscode.showInformationMessage("No tags exist yet")
+            return
+        }
+
 
         let choosenTag = await vscode.window.showQuickPick(addedTags, {
             placeHolder: "Choose tag"
@@ -335,7 +360,7 @@ const removeTag = async function (editor) {
                 async function (err, rowCount, rows) {
                     if (err) {
                         console.log(err);
-                        vscode.window.showErrorMessage("Something wrong with your database connection!")
+                        vscode.window.showErrorMessage(err.message)
                         return
                     }
 
