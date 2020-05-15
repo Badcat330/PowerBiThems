@@ -70,6 +70,11 @@ function activate(context) {
 		dbConnector.removeTag(editor)
 	})
 
+	let deleteFile = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.DeleteFile",
+		async function (editor) {
+			dbConnector.deleteFile(editor)
+		})
+
 	let changeMetadata = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.changeMetadata", async function (editor, edit) {
 		const text = editor.document.getText()
 		var style = JSON.parse(text)
@@ -134,6 +139,7 @@ function activate(context) {
 	context.subscriptions.push(changeMetadata)
 	context.subscriptions.push(addTag)
 	context.subscriptions.push(removeTag)
+	context.subscriptions.push(deleteFile)
 }
 exports.activate = activate;
 

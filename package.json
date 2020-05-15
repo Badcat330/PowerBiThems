@@ -22,7 +22,7 @@
 			},
 			{
 				"command": "power-bi-thems-extension.DbConnection",
-				"title": "BIS: Connect data base"
+				"title": "BIS: Connect to data base"
 			},
 			{
 				"command": "power-bi-thems-extension.CreateTag",
@@ -30,19 +30,19 @@
 			},
 			{
 				"command": "power-bi-thems-extension.changeTag",
-				"title": "BIS: Change tag"
+				"title": "BIS: Change tag data"
 			},
 			{
 				"command": "power-bi-thems-extension.DeleteTag",
-				"title": "BIS: Delete tag"
+				"title": "BIS: Delete tag from data base"
 			},
 			{
 				"command": "power-bi-thems-extension.Visualize",
-				"title": "BIS: Visualize"
+				"title": "BIS: Visualize test report"
 			},
 			{
 				"command": "power-bi-thems-extension.SaveFile",
-				"title": "BIS: Save file"
+				"title": "BIS: Save file to data base"
 			},
 			{
 				"command": "power-bi-thems-extension.changeMetadata",
@@ -55,6 +55,10 @@
 			{
 				"command": "power-bi-thems-extension.RemoveTag",
 				"title": "BSI: Remove tag from file"
+			},
+			{
+				"command": "power-bi-thems-extension.DeleteFile",
+				"title": "BSI: Delete file from data base"
 			}
 		],
 		"configuration": {

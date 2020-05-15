@@ -3,6 +3,7 @@ const vscode = require('vscode');
 const scriptsSQL = require('./ScriptsSQL')
 
 let connection = null
+let metadata = JSON.parse('{"*": {"Id": "","Tags": []}}')
 
 const createConnection = function (userNameGiven, userPasswordGiven) {
 
@@ -82,8 +83,7 @@ const changeTag = async function () {
                 tags.push(String(rows[i][1].value))
             }
 
-            if(tags.length == 0)
-            {
+            if (tags.length == 0) {
                 vscode.showInformationMessage("No tags exist yet")
                 return
             }
@@ -157,8 +157,7 @@ const deleteTag = function () {
                 tags.push(String(rows[i][1].value))
             }
 
-            if(tags.length == 0)
-            {
+            if (tags.length == 0) {
                 vscode.showInformationMessage("No tags exist yet")
                 return
             }
@@ -208,8 +207,6 @@ const deleteTag = function () {
 
     connection.execSql(getTagsRequest);
 }
-
-let metadata = JSON.parse('{"*": {"Id": "","Tags": []}}')
 
 const saveFile = async function (editor) {
     const text = editor.document.getText()
@@ -292,8 +289,7 @@ const addTag = async function (editor) {
                         metadata['*'].Tags.push(String(rows[i][1].value))
                 }
 
-                if(tags.length == 0)
-                {
+                if (tags.length == 0) {
                     vscode.showInformationMessage("No tags exist yet")
                     return
                 }
@@ -339,8 +335,7 @@ const removeTag = async function (editor) {
 
         var addedTags = style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Tags
 
-        if(addedTags.length == 0)
-        {
+        if (addedTags.length == 0) {
             vscode.showInformationMessage("No tags exist yet")
             return
         }
@@ -390,6 +385,43 @@ const removeTag = async function (editor) {
     }
 }
 
+const deleteFile = async function (editor) {
+    const text = editor.document.getText()
+    let style = JSON.parse(text)
+    if (!style.hasOwnProperty("visualStyles") || !style.visualStyles.hasOwnProperty("[18FA64C3-45E0-488A-ADB7-A4D37842CB93]")) {
+        vscode.window.showErrorMessage("File are not in data base")
+        return
+    }
+
+    let deleteFileRequest = new Request(scriptsSQL.deleFile,
+        async function (err) {
+            if (err) {
+                console.log(err);
+                vscode.window.showErrorMessage(err.message)
+                return
+            }
+
+            vscode.window.showInformationMessage("File was deleted")
+            metadata = ""
+            vscode.commands.executeCommand("power-bi-thems-extension.changeMetadata")
+            metadata = JSON.parse('{"*": {"Id": "","Tags": []}}')
+        })
+
+    var fileID = style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Id
+    let user = vscode.workspace.getConfiguration('power-bi-thems-extension').get("UserName")
+
+    deleteFileRequest.addParameter("user", TYPES.NVarChar, user)
+    deleteFileRequest.addParameter("id", TYPES.UniqueIdentifier, fileID)
+
+    var isShure = await vscode.window.showQuickPick(["Yes", "No"], {
+        placeHolder: "Are you shure?",
+        ignoreFocusOut: true
+    })
+
+    if (isShure == "Yes")
+        connection.execSql(deleteFileRequest)
+}
+
 module.exports.createConnection = createConnection;
 module.exports.createTag = createTag;
 module.exports.changeTag = changeTag
@@ -398,6 +430,7 @@ module.exports.saveFile = saveFile
 module.exports.metadata = metadata
 module.exports.addTag = addTag
 module.exports.removeTag = removeTag
+module.exports.deleteFile = deleteFile
 
 module.exports = {
     createConnection,
@@ -407,5 +440,6 @@ module.exports = {
     saveFile,
     metadata,
     addTag,
-    removeTag
+    removeTag,
+    deleteFile
 }
