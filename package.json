@@ -25,7 +25,7 @@
 				"title": "BIS: Connect data base"
 			},
 			{
-				"command": "power-bi-thems-extension.AddTag",
+				"command": "power-bi-thems-extension.CreateTag",
 				"title": "BIS: Create tag"
 			},
 			{

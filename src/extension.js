@@ -45,7 +45,7 @@ function activate(context) {
 		dbConnector.createConnection(name, pass)
 	});
 
-	let createTag = vscode.commands.registerCommand("power-bi-thems-extension.AddTag", async function () {
+	let createTag = vscode.commands.registerCommand("power-bi-thems-extension.CreateTag", async function () {
 		dbConnector.createTag()
 	});
 
@@ -66,7 +66,7 @@ function activate(context) {
 			dbConnector.addTag(editor)
 		})
 
-	let removeTag = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.AddTag", async function (editor) {
+	let removeTag = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.RemoveTag", async function (editor) {
 		dbConnector.removeTag(editor)
 	})
 

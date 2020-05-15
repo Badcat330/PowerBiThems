@@ -28,19 +28,23 @@ const deleteTag = "DECLARE @id_last_version UNIQUEIDENTIFIER; "+
 "INSERT INTO file_tag_version SELECT @new_id, id_file_version FROM file_tag_version WHERE id_tag_version = @id_last_version "+
 "DELETE FROM tag_current WHERE id = @id"
 
-const addTag = "INSERT INTO file_tag_current (id_file_cuurent, id_tag_current) VALUES (@id_file, @id_tag) " +
+const addTag = "INSERT INTO file_tag_current (id_file_current, id_tag_current) VALUES (@id_file, @id_tag) " +
 "DECLARE @id_last_version_file UNIQUEIDENTIFIER; " +
 "SELECT @id_last_version_file = id FROM file_version WHERE id_file_current = @id_file AND date_update = (SELECT MAX(date_update) FROM file_version WHERE id_file_current = @id_file); "+
 "DECLARE @id_last_version_tag UNIQUEIDENTIFIER; "+
 "SELECT @id_last_version_tag = id FROM tag_version WHERE id_tag_current = @id_tag AND date_update = (SELECT MAX(date_update) FROM tag_version WHERE id_tag_current = @id_tag); "+
 "DECLARE @new_id_file UNIQUEIDENTIFIER "+
 "SET @new_id_file = NEWID()  "+
-"INSERT INTO file_version SELECT @new_id_file, fv.id_file_current, USER_ID(@user), @user, fv.name, fv.data, fv.date_creation, "+
-"GETDATE() FROM file_version fv WHERE fv.id = @id_last_version_file"+
-"INSERT INTO file_tag_version SELECT ftv.id_tag_version, @new_id_file FROM file_tag_version ftv WHERE ftv.id_file_version = @id_last_version_file"+
+"DECLARE @name NVARCHAR(MAX) "+
+"DECLARE @data NVARCHAR(MAX) "+
+"DECLARE @date_creation DATETIME " +
+"SELECT @name = fv.name, @data = fv.data, @date_creation = fv.date_creation FROM file_version fv WHERE fv.id = @id_last_version_file " +
+"INSERT INTO file_version (id, id_file_current, userID, userName, name, data, date_creation, date_update) "+
+  "VALUES (@new_id_file, @id_file, USER_ID(@user), @user, @name, @data, @date_creation, GETDATE()); " +
+"INSERT INTO file_tag_version SELECT ftv.id_tag_version, @new_id_file FROM file_tag_version ftv WHERE ftv.id_file_version = @id_last_version_file "+
 "INSERT INTO file_tag_version (id_tag_version, id_file_version) VALUES (@id_last_version_tag, @id_last_version_file)"
 
-const removeTag = "DELETE FROM file_tag_current WHERE id_file_version = @id_file AND id_tag_version = @id_tag"
+const removeTag = "DELETE FROM file_tag_current WHERE id_file_current = @id_file AND id_tag_current = @id_tag"
 
 const createFile = "DECLARE @new_id_file UNIQUEIDENTIFIER "+
 "SET @new_id_file = NEWID() " +
