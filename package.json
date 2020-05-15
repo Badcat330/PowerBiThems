@@ -59,6 +59,10 @@
 			{
 				"command": "power-bi-thems-extension.DeleteFile",
 				"title": "BSI: Delete file from data base"
+			},
+			{
+				"command": "power-bi-thems-extension.DownloadFile",
+				"title": "BSI: Download file from data base"
 			}
 		],
 		"configuration": {

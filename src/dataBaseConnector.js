@@ -1,6 +1,8 @@
 const { Connection, Request, TYPES } = require("tedious");
 const vscode = require('vscode');
 const scriptsSQL = require('./ScriptsSQL')
+const fs = require('fs')
+const path = require('path')
 
 let connection = null
 let metadata = JSON.parse('{"*": {"Id": "","Tags": []}}')
@@ -420,6 +422,54 @@ const deleteFile = async function (editor) {
 
     if (isShure == "Yes")
         connection.execSql(deleteFileRequest)
+}
+
+let downloadFile = async function (editor) {
+
+    let donloadFileRequest = new Request(scriptsSQL.getFile,
+        async function (err, rowCount, rows) {
+            if (err) {
+                console.log(err);
+                vscode.window.showErrorMessage(err.message)
+                return
+            }
+
+            var names = []
+
+            for (var i = 0; i < rowCount; i++) {
+                names.push(rows[i][1].value)
+            }
+
+            if (names.length == 0) {
+                vscode.showInformationMessage("No file in data base yet")
+                return
+            }
+
+            let choosenFile = await vscode.window.showQuickPick(names, {
+                placeHolder: "Choose file"
+            })
+
+            var index = names.findIndex(item => item == choosenFile)
+            let id = rows[index][0].value
+            let data = rows[index][2]
+            let userName = rows[index][3].value
+            let dateUpdate = rows[index][4].value
+
+            metadata['*'].Id = id
+
+            //TODO Execut tags request
+
+            const folderPath = vscode.workspace.workspaceFolders[0].uri
+                .toString()
+                .split("")[1];
+
+            fs.writeFile(path.join(folderPath, choosenFile), data, err => {
+                if (err) {
+                    console.log(err)
+                    vscode.window.showInformationMessage("Can't creat file on your computer")
+                }
+            })
+        })
 }
 
 module.exports.createConnection = createConnection;
