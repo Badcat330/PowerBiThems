@@ -47,6 +47,14 @@
 			{
 				"command": "power-bi-thems-extension.changeMetadata",
 				"title": "BSI: Reload metadate"
+			},
+			{
+				"command": "power-bi-thems-extension.AddTag",
+				"title": "BSI: Add tag to file"
+			},
+			{
+				"command": "power-bi-thems-extension.RemoveTag",
+				"title": "BSI: Remove tag from file"
 			}
 		],
 		"configuration": {

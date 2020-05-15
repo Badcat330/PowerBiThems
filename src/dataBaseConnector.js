@@ -126,7 +126,7 @@ const changeTag = async function () {
                     changeNameRequest.addParameter("is_process", TYPES.Bit, isProcess == "Yes" ? 1 : 0)
                     changeNameRequest.addParameter("is_normativeOld", TYPES.Bit, rows[index][3].value)
                     changeNameRequest.addParameter("is_processOld", TYPES.Bit, rows[index][4].value)
-                   
+
                     connection.execSql(changeNameRequest);
                 })
             })
@@ -197,12 +197,12 @@ const deleteTag = function () {
     connection.execSql(getTagsRequest);
 }
 
-let metadata = JSON.parse('{"*": {"Id": "","Tag": []}}')
+let metadata = JSON.parse('{"*": {"Id": "","Tags": []}}')
 
-const saveFile = async function (editor){
+const saveFile = async function (editor) {
     const text = editor.document.getText()
-	var style = JSON.parse(text)
-	if (!style.hasOwnProperty("visualStyles") || !style.visualStyles.hasOwnProperty("[18FA64C3-45E0-488A-ADB7-A4D37842CB93]")) {
+    var style = JSON.parse(text)
+    if (!style.hasOwnProperty("visualStyles") || !style.visualStyles.hasOwnProperty("[18FA64C3-45E0-488A-ADB7-A4D37842CB93]")) {
         var createfileRequest = new Request(scriptsSQL.createFile,
             (err, rowCount, rows) => {
                 if (err) {
@@ -214,15 +214,14 @@ const saveFile = async function (editor){
                 console.log(metadata)
                 vscode.commands.executeCommand("power-bi-thems-extension.changeMetadata")
                 vscode.window.showInformationMessage("File was  to db")
-        })
+            })
         let user = vscode.workspace.getConfiguration('power-bi-thems-extension').get("UserName")
         createfileRequest.addParameter("user", TYPES.NVarChar, user)
         createfileRequest.addParameter("data", TYPES.NVarChar, text)
         createfileRequest.addParameter("name", TYPES.NVarChar, editor.document.fileName.replace(/^.*[\\\/]/, ''))
         connection.execSql(createfileRequest);
     }
-    else
-    {
+    else {
         var savefileRequest = new Request(scriptsSQL.saveFile,
             (err) => {
                 if (err) {
@@ -231,7 +230,7 @@ const saveFile = async function (editor){
                     return
                 }
                 vscode.window.showInformationMessage("File was saved")
-        })
+            })
         let user = vscode.workspace.getConfiguration('power-bi-thems-extension').get("UserName")
         savefileRequest.addParameter("user", TYPES.NVarChar, user)
         savefileRequest.addParameter("new_data", TYPES.NVarChar, text)
@@ -239,7 +238,131 @@ const saveFile = async function (editor){
         savefileRequest.addParameter("id", TYPES.UniqueIdentifier, style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Id)
         connection.execSql(savefileRequest);
     }
-    
+
+}
+
+const addTag = async function (editor) {
+    const text = editor.document.getText()
+    let style = JSON.parse(text)
+    if (!style.hasOwnProperty("visualStyles") || !style.visualStyles.hasOwnProperty("[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"))
+        vscode.window.showErrorMessage("Save file in data base first!")
+    else {
+        let addTagRequest = new Request(scriptsSQL.addTag,
+            async function (err) {
+                if (err) {
+                    console.log(err);
+                    vscode.window.showErrorMessage("Something wrong with your database connection!")
+                    return
+                }
+                vscode.window.showInformationMessage("Tag added")
+            })
+
+        let user = vscode.workspace.getConfiguration('power-bi-thems-extension').get("UserName")
+        addTagRequest.addParameter("user", TYPES.NVarChar, user)
+
+
+
+        let getTagsRequest = new Request(scriptsSQL.getTags,
+            async function (err, rowCount, rows) {
+                if (err) {
+                    console.log(err);
+                    vscode.window.showErrorMessage("Something wrong with your database connection!")
+                    return
+                }
+                var tags = [];
+                metadata['*'].Tags = []
+                var addedTag = style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Tags
+
+                for (var i = 0; i < rowCount; i++) {
+                    if (!addedTag.includes(rows[i][1].value))
+                        tags.push(String(rows[i][1].value))
+                    else
+                        metadata['*'].Tags.push(String(rows[i][1].value))
+                }
+
+                let choosenTag = await vscode.window.showQuickPick(tags, {
+                    placeHolder: "Choose tag"
+                })
+
+                var index = tags.findIndex(item => item == choosenTag)
+                addTagRequest.addParameter("id_tag", TYPES.UniqueIdentifier, rows[index][0].value)
+                var fileID = style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Id
+                addTagRequest.addParameter("id_file", TYPES.UniqueIdentifier, fileID)
+
+                connection.execSql(addTagRequest)
+
+                metadata['*'].Id = fileID
+                metadata['*'].Tags.push(choosenTag)
+                vscode.commands.executeCommand("power-bi-thems-extension.changeMetadata")
+            })
+
+        connection.execSql(getTagsRequest)
+    }
+}
+
+const removeTag = async function (editor) {
+    const text = editor.document.getText()
+    let style = JSON.parse(text)
+
+    if (!style.hasOwnProperty("visualStyles") || !style.visualStyles.hasOwnProperty("[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"))
+        vscode.window.showErrorMessage("Save file in data base first!")
+    else {
+        let removeTagRequest = new Request(scriptsSQL.removeTag,
+            async function (err) {
+                if (err) {
+                    console.log(err);
+                    vscode.window.showErrorMessage("Something wrong with your database connection!")
+                    return
+                }
+
+                vscode.window.showInformationMessage("Tag was removed")
+            }
+        )
+
+        var addedTags = style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Tags
+
+        let choosenTag = await vscode.window.showQuickPick(addedTags, {
+            placeHolder: "Choose tag"
+        })
+
+        var isShure = await vscode.window.showQuickPick(["Yes", "No"], {
+            placeHolder: "Are you shure?",
+            ignoreFocusOut: true
+        })
+
+        if (isShure == 'Yes') {
+            let getTagsRequest = new Request(scriptsSQL.getTags,
+                async function (err, rowCount, rows) {
+                    if (err) {
+                        console.log(err);
+                        vscode.window.showErrorMessage("Something wrong with your database connection!")
+                        return
+                    }
+
+                    var tags = [];
+
+                    for (var i = 0; i < rowCount; i++) {
+                        tags.push(String(rows[i][1].value))
+                    }
+
+                    var index = tags.findIndex(item => item == choosenTag)
+                    var fileID = style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Id
+
+                    removeTagRequest.addParameter("id_tag", TYPES.UniqueIdentifier, rows[index][0].value)
+                    removeTagRequest.addParameter("id_file", TYPES.UniqueIdentifier, fileID)
+
+                    connection.execSql(removeTagRequest)
+
+                    metadata['*'].Id = fileID
+                    metadata['*'].Tags = addedTags
+                    index = addedTags.findIndex(item => item == choosenTag)
+                    metadata['*'].Tags.splice(index, 1);
+                    vscode.commands.executeCommand("power-bi-thems-extension.changeMetadata")
+                })
+
+            connection.execSql(getTagsRequest)
+        }
+    }
 }
 
 module.exports.createConnection = createConnection;
@@ -248,6 +371,8 @@ module.exports.changeTag = changeTag
 module.exports.deleteTag = deleteTag
 module.exports.saveFile = saveFile
 module.exports.metadata = metadata
+module.exports.addTag = addTag
+module.exports.removeTag = removeTag
 
 module.exports = {
     createConnection,
@@ -255,5 +380,7 @@ module.exports = {
     changeTag,
     deleteTag,
     saveFile,
-    metadata
+    metadata,
+    addTag,
+    removeTag
 }
