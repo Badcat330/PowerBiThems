@@ -61,13 +61,13 @@ ADD CONSTRAINT FK_file_version_id_file_current FOREIGN KEY (id_file_current) REF
 GO
 
 CREATE TABLE themes.dbo.file_tag_current (
-  id_file_cuurent UNIQUEIDENTIFIER NULL
+  id_file_current UNIQUEIDENTIFIER NULL
  ,id_tag_current UNIQUEIDENTIFIER NULL
 ) ON [PRIMARY]
 GO
 
 ALTER TABLE themes.dbo.file_tag_current
-ADD CONSTRAINT FK_file_tag_id_file FOREIGN KEY (id_file_cuurent) REFERENCES dbo.file_current (id) ON DELETE CASCADE
+ADD CONSTRAINT FK_file_tag_id_file FOREIGN KEY (id_file_current) REFERENCES dbo.file_current (id) ON DELETE CASCADE
 GO
 
 ALTER TABLE themes.dbo.file_tag_current

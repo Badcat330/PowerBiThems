@@ -39,6 +39,11 @@ const createConnection = function (userNameGiven, userPasswordGiven) {
 }
 
 const createTag = async function () {
+    if(connection == null)
+    {
+        vscode.window.showErrorMessage("Update your data base connection")
+        return
+    }
     let name = await vscode.window.showInputBox({
         placeHolder: "Add tag name",
         ignoreFocusOut: true
@@ -70,7 +75,11 @@ const createTag = async function () {
 }
 
 const changeTag = async function () {
-
+    if(connection == null)
+    {
+        vscode.window.showErrorMessage("Update your data base connection")
+        return
+    }
     var getTagsRequest = new Request(scriptsSQL.getTags,
         async function (err, rowCount, rows) {
             if (err) {
@@ -145,6 +154,11 @@ const changeTag = async function () {
 }
 
 const deleteTag = function () {
+    if(connection == null)
+    {
+        vscode.window.showErrorMessage("Update your data base connection")
+        return
+    }
     var getTagsRequest = new Request(scriptsSQL.getTags,
         (err, rowCount, rows) => {
             if (err) {
@@ -211,6 +225,11 @@ const deleteTag = function () {
 }
 
 const saveFile = async function (editor) {
+    if(connection == null)
+    {
+        vscode.window.showErrorMessage("Update your data base connection")
+        return
+    }
     const text = editor.document.getText()
     var style = JSON.parse(text)
     if (!style.hasOwnProperty("visualStyles") || !style.visualStyles.hasOwnProperty("[18FA64C3-45E0-488A-ADB7-A4D37842CB93]")) {
@@ -224,7 +243,7 @@ const saveFile = async function (editor) {
                 metadata['*'].Id = rows[0][0].value
                 console.log(metadata)
                 vscode.commands.executeCommand("power-bi-thems-extension.changeMetadata")
-                vscode.window.showInformationMessage("File was  to db")
+                vscode.window.showInformationMessage("File was  saved")
             })
         let user = vscode.workspace.getConfiguration('power-bi-thems-extension').get("UserName")
         createfileRequest.addParameter("user", TYPES.NVarChar, user)
@@ -253,6 +272,11 @@ const saveFile = async function (editor) {
 }
 
 const addTag = async function (editor) {
+    if(connection == null)
+    {
+        vscode.window.showErrorMessage("Update your data base connection")
+        return
+    }
     const text = editor.document.getText()
     let style = JSON.parse(text)
     if (!style.hasOwnProperty("visualStyles") || !style.visualStyles.hasOwnProperty("[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"))
@@ -300,7 +324,7 @@ const addTag = async function (editor) {
                     placeHolder: "Choose tag"
                 })
 
-                var index = tags.findIndex(item => item == choosenTag)
+                var index = rows.findIndex(item => item[1].value == choosenTag)
                 addTagRequest.addParameter("id_tag", TYPES.UniqueIdentifier, rows[index][0].value)
                 var fileID = style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Id
                 addTagRequest.addParameter("id_file", TYPES.UniqueIdentifier, fileID)
@@ -317,6 +341,12 @@ const addTag = async function (editor) {
 }
 
 const removeTag = async function (editor) {
+    if(connection == null)
+    {
+        vscode.window.showErrorMessage("Update your data base connection")
+        return
+    }
+
     const text = editor.document.getText()
     let style = JSON.parse(text)
 
@@ -424,9 +454,14 @@ const deleteFile = async function (editor) {
         connection.execSql(deleteFileRequest)
 }
 
-let downloadFile = async function (editor) {
+let downloadFile = async function () {
+    if(connection == null)
+    {
+        vscode.window.showErrorMessage("Update your data base connection")
+        return
+    }
 
-    let donloadFileRequest = new Request(scriptsSQL.getFile,
+    let downloadFileRequest = new Request(scriptsSQL.getFile,
         async function (err, rowCount, rows) {
             if (err) {
                 console.log(err);
@@ -451,25 +486,67 @@ let downloadFile = async function (editor) {
 
             var index = names.findIndex(item => item == choosenFile)
             let id = rows[index][0].value
-            let data = rows[index][2]
+            let data = rows[index][2].value
             let userName = rows[index][3].value
             let dateUpdate = rows[index][4].value
 
             metadata['*'].Id = id
 
-            //TODO Execut tags request
+            let getTagsRequest = new Request(scriptsSQL.getTagsFile,
+                async function(err, rowCount, rows){
+                    if (err) {
+                        console.log(err);
+                        vscode.window.showErrorMessage(err.message)
+                        return
+                    }
 
-            const folderPath = vscode.workspace.workspaceFolders[0].uri
-                .toString()
-                .split("")[1];
+                    let dataJSON = JSON.parse(data)
+                    let message = `File ${choosenFile} was downloaded! Created by user ${userName}. Last update ${dateUpdate}.`
 
-            fs.writeFile(path.join(folderPath, choosenFile), data, err => {
-                if (err) {
-                    console.log(err)
-                    vscode.window.showInformationMessage("Can't creat file on your computer")
-                }
-            })
+                    if(rowCount != 0)
+                        message += " Tags:"
+
+                    for(var i = 0; i < rowCount; i++){
+                        metadata['*'].Tags.push(rows[i][0].value)
+                        message += ` ${rows[i][0].value}`
+                    }
+
+
+                    if (!dataJSON.hasOwnProperty("visualStyles")) {
+                        dataJSON["visualStyles"] = {
+                            "[18FA64C3-45E0-488A-ADB7-A4D37842CB93]": metadata
+                        };
+                    }
+                    else {
+                        dataJSON.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"] = metadata
+                    }
+
+                    data = JSON.stringify(dataJSON, null, '\t')
+
+                    if(vscode.workspace.workspaceFolders == undefined){
+                        vscode.window.showErrorMessage("Open folder befor downloading file.")
+                        return
+                    }
+
+                    const folderPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+
+                    fs.writeFile(path.join(folderPath, choosenFile), data, err => {
+                        if (err) {
+                            console.log(err)
+                            vscode.window.showErrorMessage("Can't creat file on your computer")
+                            return
+                        }
+
+                        vscode.window.showInformationMessage(message)
+                    })
+
+                })
+            getTagsRequest.addParameter("id", TYPES.UniqueIdentifier, id)
+            connection.execSql(getTagsRequest)
+            
         })
+
+    connection.execSql(downloadFileRequest)
 }
 
 module.exports.createConnection = createConnection;
@@ -481,6 +558,7 @@ module.exports.metadata = metadata
 module.exports.addTag = addTag
 module.exports.removeTag = removeTag
 module.exports.deleteFile = deleteFile
+module.exports.downloadFile = downloadFile
 
 module.exports = {
     createConnection,
@@ -491,5 +569,6 @@ module.exports = {
     metadata,
     addTag,
     removeTag,
-    deleteFile
+    deleteFile,
+    downloadFile
 }

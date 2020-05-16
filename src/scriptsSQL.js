@@ -82,6 +82,8 @@ const deleFile = "DECLARE @new_id UNIQUEIDENTIFIER " +
 
 const getFile = "SELECT id, name, data, userName, date_update FROM file_current"
 
+const getTagsFile = "SELECT tc.name FROM tag_current tc JOIN file_tag_current ftc ON ftc.id_tag_current = tc.id WHERE ftc.id_file_current = @id"
+
 exports.createTag = createTag
 exports.renameTag = renameTag
 exports.getTags = getTags
@@ -92,6 +94,7 @@ exports.saveFile = saveFile
 exports.createFile = createFile
 exports.deleFile = deleFile
 exports.getFile = getFile
+exports.getTagsFile = getTagsFile
 
 module.export = {
   createTag,
@@ -103,5 +106,6 @@ module.export = {
   saveFile,
   createFile,
   deleFile,
-  getFile
+  getFile,
+  getTagsFile
 }
