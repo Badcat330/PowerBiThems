@@ -7,7 +7,9 @@ const createTag = "if EXISTS(SELECT id FROM tag_current WHERE name like @name) "
   "INSERT INTO tag_version (id, id_tag_current, name, date_creation, date_update, userID, userName, is_normative, is_process) " +
   "VALUES (NEWID(), @id, @name, GETDATE(), getdate(), USER_ID(@user), @user, @is_normative, @is_process) "
 
-const renameTag = "DECLARE @id_last_version UNIQUEIDENTIFIER; " +
+const renameTag = "if EXISTS(SELECT id FROM tag_current WHERE name like @new_name) " +
+  "THROW 50000, 'The record already exist.', 1; " +
+  "DECLARE @id_last_version UNIQUEIDENTIFIER; " +
   "SELECT @id_last_version = id FROM tag_version WHERE id_tag_current = @id AND date_update = (SELECT MAX(date_update) FROM tag_version WHERE id_tag_current = @id); " +
   "DECLARE @new_id UNIQUEIDENTIFIER " +
   "SET @new_id = NEWID() " +
@@ -42,7 +44,7 @@ const addTag = "INSERT INTO file_tag_current (id_file_current, id_tag_current) V
   "INSERT INTO file_version (id, id_file_current, userID, userName, name, data, date_creation, date_update) " +
   "VALUES (@new_id_file, @id_file, USER_ID(@user), @user, @name, @data, @date_creation, GETDATE()); " +
   "INSERT INTO file_tag_version SELECT ftv.id_tag_version, @new_id_file FROM file_tag_version ftv WHERE ftv.id_file_version = @id_last_version_file " +
-  "INSERT INTO file_tag_version (id_tag_version, id_file_version) VALUES (@id_last_version_tag, @id_last_version_file)"
+  "INSERT INTO file_tag_version (id_tag_version, id_file_version) VALUES (@id_last_version_tag, @new_id_file)"
 
 const removeTag = "DELETE FROM file_tag_current WHERE id_file_current = @id_file AND id_tag_current = @id_tag"
 
@@ -84,6 +86,8 @@ const getFile = "SELECT id, name, data, userName, date_update FROM file_current"
 
 const getTagsFile = "SELECT tc.name FROM tag_current tc JOIN file_tag_current ftc ON ftc.id_tag_current = tc.id WHERE ftc.id_file_current = @id"
 
+const getFileInformation = "SELECT name, userName, date_update FROM file_current where id = @id"
+
 exports.createTag = createTag
 exports.renameTag = renameTag
 exports.getTags = getTags
@@ -95,6 +99,7 @@ exports.createFile = createFile
 exports.deleFile = deleFile
 exports.getFile = getFile
 exports.getTagsFile = getTagsFile
+exports.getFileInformation = getFileInformation
 
 module.export = {
   createTag,
@@ -107,5 +112,6 @@ module.export = {
   createFile,
   deleFile,
   getFile,
-  getTagsFile
+  getTagsFile,
+  getFileInformation
 }

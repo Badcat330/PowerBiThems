@@ -78,6 +78,12 @@ function activate(context) {
 	let downloadFile = vscode.commands.registerCommand("power-bi-thems-extension.DownloadFile", async function(){
 		dbConnector.downloadFile()
 	})
+
+	let showFileInformation = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.ShowFileInformation",
+	async function (editor) {
+		dbConnector.getInformationFromFile(editor)
+	})
+
 	let changeMetadata = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.changeMetadata", async function (editor, edit) {
 		const text = editor.document.getText()
 		var style = JSON.parse(text)
@@ -100,33 +106,59 @@ function activate(context) {
 	})
 
 	let visualize = vscode.commands.registerCommand("power-bi-thems-extension.Visualize", async function () {
-		const pathConfig = vscode.workspace.getConfiguration('power-bi-thems-extension').get("PowerBiPath")
-		if (pathConfig == "") {
-			const input = vscode.window.showOpenDialog({
-				filters: {
-					"Power BI": ['pbix']
-				},
-				openLabel: "Open Test"
-			})
+		let normativePath = vscode.workspace.getConfiguration('power-bi-thems-extension').get("NormativeTestPath")
+		let customPath = vscode.workspace.getConfiguration('power-bi-thems-extension').get("CustomTestPath")
 
-			Promise.resolve(input).then(function (inputPath) {
-				cp.exec('"' + inputPath[0].path.substring(1, inputPath[0].path.length) + '"', function (err) {
-					if (err) {
-						console.log(err)
-						vscode.window.showErrorMessage("Something wrong with your path, try again")
-					}
-					else
-						vscode.window.showInformationMessage("If you want set default path for test file," +
-							" you can do it in settings!")
+		let customPathFlag = false
+		let normativePathFlag = false
+		
+		let answer = await vscode.window.showQuickPick(["Normative", "Custom", "Both"], {placeHolder : "What test do you like to open?"})
 
-				})
-			})
+		if(answer == "Normative")
+			normativePathFlag = true
+		if(answer == "Custom")
+			customPathFlag = true
+		if(answer == "Both"){
+			normativePathFlag = true
+			customPathFlag = true
 		}
-		else {
-			cp.exec('"' + pathConfig + '"', function (err) {
+
+		if(customPathFlag){
+			if(customPath == ""){
+				var inputPath = await vscode.window.showOpenDialog({
+					filters: {
+						"Power BI": ['pbix']
+					},
+					openLabel: "Open custom test"
+				})
+
+				customPath = inputPath[0].path.substring(1, inputPath[0].path.length)
+			}
+
+			cp.exec('"' + customPath + '"', function (err) {
 				if (err) {
 					console.log(err)
-					vscode.window.showErrorMessage("Something wrong with your path, try again")
+					vscode.window.showErrorMessage("Something wrong with your custom path, try again.")
+				}
+			})
+		}
+
+		if(normativePathFlag){
+			if(normativePath == ""){
+				var inputPath = await vscode.window.showOpenDialog({
+					filters: {
+						"Power BI": ['pbix']
+					},
+					openLabel: "Open normative test"
+				})
+
+				normativePath = inputPath[0].path.substring(1, inputPath[0].path.length)
+			}
+
+			cp.exec('"' + normativePath + '"', function (err) {
+				if (err) {
+					console.log(err)
+					vscode.window.showErrorMessage("Something wrong with your normative path, try again.")
 				}
 			})
 		}
@@ -144,6 +176,7 @@ function activate(context) {
 	context.subscriptions.push(removeTag)
 	context.subscriptions.push(deleteFile)
 	context.subscriptions.push(downloadFile)
+	context.subscriptions.push(showFileInformation)
 }
 exports.activate = activate;
 

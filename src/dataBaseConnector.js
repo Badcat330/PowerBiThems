@@ -316,7 +316,7 @@ const addTag = async function (editor) {
                 }
 
                 if (tags.length == 0) {
-                    vscode.showInformationMessage("No tags exist yet")
+                    vscode.window.showInformationMessage("No tags exist yet")
                     return
                 }
 
@@ -368,7 +368,7 @@ const removeTag = async function (editor) {
         var addedTags = style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Tags
 
         if (addedTags.length == 0) {
-            vscode.showInformationMessage("No tags exist yet")
+            vscode.window.showInformationMessage("No tags exist yet")
             return
         }
 
@@ -476,7 +476,7 @@ let downloadFile = async function () {
             }
 
             if (names.length == 0) {
-                vscode.showInformationMessage("No file in data base yet")
+                vscode.window.showInformationMessage("No file in data base yet")
                 return
             }
 
@@ -549,6 +549,69 @@ let downloadFile = async function () {
     connection.execSql(downloadFileRequest)
 }
 
+const getInformationFromFile = async function (editor){
+    if(connection == null){
+        vscode.window.showErrorMessage("Update your data base connection")
+        return
+    }
+
+    const text = editor.document.getText()
+    let style = JSON.parse(text)
+
+    if (!style.hasOwnProperty("visualStyles") || !style.visualStyles.hasOwnProperty("[18FA64C3-45E0-488A-ADB7-A4D37842CB93]")) {
+        vscode.window.showErrorMessage("File are not in data base")
+        return
+    }
+
+    var fileID = style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Id
+
+    const getInformationRequest = new Request(scriptsSQL.getFileInformation, 
+        async function(err, rowCount, rows){
+            if (err) {
+                console.log(err);
+                vscode.window.showErrorMessage(err.message)
+                return
+            }
+            
+            if(rowCount == 0){
+                vscode.window.showErrorMessage("Something wrong with file metadate")
+                return
+            }
+
+            let message = `File ${rows[0][0].value} was changed last time at ${rows[0][2].value} by ${rows[0][1].value}.`
+
+            let getTagsRequest = new Request(scriptsSQL.getTagsFile,
+                function (err, rowCount, rows){
+                    if (err) {
+                        console.log(err);
+                        vscode.window.showErrorMessage(err.message)
+                        return
+                    }
+
+                    if(rowCount == 0){
+                        vscode.window.showInformationMessage(message)
+                        return
+                    }
+                    else{
+                        message+= " Tags:"
+                    }
+
+                    for(var i = 0 ; i< rowCount; i++){
+                        message += " " + rows[i][0].value
+                    }
+                    message += '.'
+
+                    vscode.window.showInformationMessage(message)
+            })
+
+            getTagsRequest.addParameter("id", TYPES.UniqueIdentifier, fileID)
+            connection.execSql(getTagsRequest)
+        })
+
+    getInformationRequest.addParameter("id", TYPES.UniqueIdentifier, fileID)
+    connection.execSql(getInformationRequest)
+}
+
 module.exports.createConnection = createConnection;
 module.exports.createTag = createTag;
 module.exports.changeTag = changeTag
@@ -559,6 +622,7 @@ module.exports.addTag = addTag
 module.exports.removeTag = removeTag
 module.exports.deleteFile = deleteFile
 module.exports.downloadFile = downloadFile
+module.exports.getInformationFromFile = getInformationFromFile
 
 module.exports = {
     createConnection,
@@ -570,5 +634,6 @@ module.exports = {
     addTag,
     removeTag,
     deleteFile,
-    downloadFile
+    downloadFile,
+    getInformationFromFile
 }

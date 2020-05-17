@@ -63,6 +63,10 @@
 			{
 				"command": "power-bi-thems-extension.DownloadFile",
 				"title": "BSI: Download file from data base"
+			},
+			{
+				"command": "power-bi-thems-extension.ShowFileInformation",
+				"title": "BSI: Show file information"
 			}
 		],
 		"configuration": {
@@ -88,10 +92,10 @@
 					"default": "",
 					"description": "Path to test normative report"
 				},
-				"power-bi-thems-extension.CastomTestPath": {
+				"power-bi-thems-extension.CustomTestPath": {
 					"type": "string",
 					"default": "",
-					"description": "Path to test castom report"
+					"description": "Path to test custom report"
 				}
 			}
 		}
