@@ -84,6 +84,11 @@ function activate(context) {
 		dbConnector.getInformationFromFile(editor)
 	})
 
+	let backToFileVersion = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.BackFileVersion",
+	async function(editor){
+		dbConnector.backToVersionFile(editor)
+	})
+
 	let changeMetadata = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.changeMetadata", async function (editor, edit) {
 		const text = editor.document.getText()
 		var style = JSON.parse(text)
@@ -177,6 +182,7 @@ function activate(context) {
 	context.subscriptions.push(deleteFile)
 	context.subscriptions.push(downloadFile)
 	context.subscriptions.push(showFileInformation)
+	context.subscriptions.push(backToFileVersion)
 }
 exports.activate = activate;
 

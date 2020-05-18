@@ -418,6 +418,11 @@ const removeTag = async function (editor) {
 }
 
 const deleteFile = async function (editor) {
+    if(connection == null)
+    {
+        vscode.window.showErrorMessage("Update your data base connection")
+        return
+    }
     const text = editor.document.getText()
     let style = JSON.parse(text)
     if (!style.hasOwnProperty("visualStyles") || !style.visualStyles.hasOwnProperty("[18FA64C3-45E0-488A-ADB7-A4D37842CB93]")) {
@@ -425,7 +430,7 @@ const deleteFile = async function (editor) {
         return
     }
 
-    let deleteFileRequest = new Request(scriptsSQL.deleFile,
+    let deleteFileRequest = new Request(scriptsSQL.deletFile,
         async function (err) {
             if (err) {
                 console.log(err);
@@ -612,6 +617,115 @@ const getInformationFromFile = async function (editor){
     connection.execSql(getInformationRequest)
 }
 
+const backToVersionFile = async function(editor){
+    if(connection == null){
+        vscode.window.showErrorMessage("Update your data base connection")
+        return
+    }
+
+    let text = editor.document.getText()
+    let style = JSON.parse(text)
+
+    if (!style.hasOwnProperty("visualStyles") || !style.visualStyles.hasOwnProperty("[18FA64C3-45E0-488A-ADB7-A4D37842CB93]")) {
+        vscode.window.showErrorMessage("File are not in data base")
+        return
+    }
+
+    let fileID = style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"]["*"].Id
+    let user = vscode.workspace.getConfiguration('power-bi-thems-extension').get("UserName")
+    let fileName = editor.document.fileName.replace(/^.*[\\\/]/, '')
+    let filePath = editor.document.fileName
+    metadata = JSON.parse('{"*": {"Id": "","Tags": []}}')
+    metadata['*'].Id = fileID
+
+
+    let getFileVersionRequest = new Request(scriptsSQL.getFileVersion,
+        async function (err, rowCount, rows){
+            if (err) {
+                console.log(err);
+                vscode.window.showErrorMessage(err.message)
+                return
+            }
+        
+            if(rowCount == 0){
+                vscode.window.showErrorMessage("Something wrong with file metadate")
+                return
+            }
+
+            var date_updates = []
+
+            for(var i = 0; i < rowCount; i++){
+                date_updates.push(String(rows[i][0].value))
+            }
+
+            var version = await vscode.window.showQuickPick(date_updates, {placeHolder : "Choode version date"})
+            let index = date_updates.findIndex(item => item == version)
+            let data = rows[index][2].value
+
+            var savefileRequest = new Request(scriptsSQL.saveFile,
+                async function(err){
+                    if (err) {
+                        console.log(err);
+                        vscode.window.showErrorMessage(err.message)
+                        return
+                    }
+                    vscode.window.showInformationMessage("File was saved")
+
+                    let BackFileRequest = new Request(scriptsSQL.getTagsFileVersion, 
+                        async function(err, rowCount, rows){
+                            if (err) {
+                                console.log(err);
+                                vscode.window.showErrorMessage(err.message)
+                                return
+                            }
+        
+                            
+                            for(var i = 0; i < rows.length; i++){
+                                metadata['*'].Tags.push(rows[i][0].value)
+                            }
+        
+                            let dataJSON = JSON.parse(data)
+        
+                            if (!dataJSON.hasOwnProperty("visualStyles")) {
+                                dataJSON["visualStyles"] = {
+                                    "[18FA64C3-45E0-488A-ADB7-A4D37842CB93]": metadata
+                                };
+                            }
+                            else {
+                                dataJSON.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"] = metadata
+                            }
+                            
+                            var newText = JSON.stringify(dataJSON, null, '\t')
+
+                            fs.writeFile(filePath, newText, err =>{
+                                if(err){
+                                    console.log(err)
+                                    vscode.window.showErrorMessage("Can't rewrite file")
+                                }
+                            })
+
+                            vscode.window.showInformationMessage("Version was back")
+                        })
+                    
+                    BackFileRequest.addParameter("id_file", TYPES.UniqueIdentifier, fileID)
+                    BackFileRequest.addParameter("id_version", TYPES.UniqueIdentifier, rows[index][1].value)
+                    BackFileRequest.addParameter("user", TYPES.NVarChar, user)
+
+                    connection.execSql(BackFileRequest)
+                })
+        
+            savefileRequest.addParameter("user", TYPES.NVarChar, user)
+            savefileRequest.addParameter("new_data", TYPES.NVarChar, text)
+            savefileRequest.addParameter("new_name", TYPES.NVarChar, fileName)
+            savefileRequest.addParameter("id", TYPES.UniqueIdentifier, fileID)
+
+            connection.execSql(savefileRequest)  
+    })
+
+    getFileVersionRequest.addParameter("id", TYPES.UniqueIdentifier, fileID)
+    connection.execSql(getFileVersionRequest)
+}
+
 module.exports.createConnection = createConnection;
 module.exports.createTag = createTag;
 module.exports.changeTag = changeTag
@@ -623,6 +737,7 @@ module.exports.removeTag = removeTag
 module.exports.deleteFile = deleteFile
 module.exports.downloadFile = downloadFile
 module.exports.getInformationFromFile = getInformationFromFile
+module.exports.backToVersionFile = backToVersionFile
 
 module.exports = {
     createConnection,
@@ -635,5 +750,6 @@ module.exports = {
     removeTag,
     deleteFile,
     downloadFile,
-    getInformationFromFile
+    getInformationFromFile,
+    backToVersionFile,
 }
