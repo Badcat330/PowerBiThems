@@ -10,7 +10,6 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*",
 		"onCommand:power-bi-thems-extension.DbConnection"
 	],
 	"main": "./src/extension.js",
@@ -102,7 +101,20 @@
 					"description": "Path to test custom report"
 				}
 			}
-		}
+		},
+		"keybindings" : [
+			{
+				"command": "power-bi-thems-extension.SaveFile",
+				"key": "ctrl+alt+t",
+				"mac": "shift+option+T",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "power-bi-thems-extension.Visualize",
+				"key": "ctrl+alt+V",
+				"mac": "shift+option+T"
+			}
+		]
 	},
 	"scripts": {
 		"lint": "eslint .",
