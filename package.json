@@ -3,6 +3,7 @@
 	"displayName": "Power Bi Thems Extension",
 	"description": "This is extension for managing Power BI styles.",
 	"version": "0.0.5",
+	"publisher": "AlexGlushko",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Badcat330/PowerBiThems.git"
@@ -106,7 +107,7 @@
 				}
 			}
 		},
-		"keybindings" : [
+		"keybindings": [
 			{
 				"command": "power-bi-thems-extension.SaveFile",
 				"key": "ctrl+alt+t",
