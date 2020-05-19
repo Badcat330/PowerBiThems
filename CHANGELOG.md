@@ -2,8 +2,11 @@
 
 All notable changes to the "power-bi-thems-extension" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
 
 - Initial release
+
+## [0.0.5]
+
+Beta release, add body for most of functions. Try it now!
