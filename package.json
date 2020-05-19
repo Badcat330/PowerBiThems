@@ -10,7 +10,6 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*",
 		"onCommand:power-bi-thems-extension.DbConnection"
 	],
 	"main": "./src/extension.js",
@@ -46,27 +45,31 @@
 			},
 			{
 				"command": "power-bi-thems-extension.changeMetadata",
-				"title": "BSI: Reload metadate"
+				"title": "BIS: Metadata change"
 			},
 			{
 				"command": "power-bi-thems-extension.AddTag",
-				"title": "BSI: Add tag to file"
+				"title": "BIS: Add tag to file"
 			},
 			{
 				"command": "power-bi-thems-extension.RemoveTag",
-				"title": "BSI: Remove tag from file"
+				"title": "BIS: Remove tag from file"
 			},
 			{
 				"command": "power-bi-thems-extension.DeleteFile",
-				"title": "BSI: Delete file from data base"
+				"title": "BIS: Delete file from data base"
 			},
 			{
 				"command": "power-bi-thems-extension.DownloadFile",
-				"title": "BSI: Download file from data base"
+				"title": "BIS: Download file from data base"
 			},
 			{
 				"command": "power-bi-thems-extension.ShowFileInformation",
-				"title": "BSI: Show file information"
+				"title": "BIS: Show file information"
+			},
+			{
+				"command": "power-bi-thems-extension.BackFileVersion",
+				"title": "BIS: Back to file version"
 			}
 		],
 		"configuration": {
@@ -98,7 +101,20 @@
 					"description": "Path to test custom report"
 				}
 			}
-		}
+		},
+		"keybindings" : [
+			{
+				"command": "power-bi-thems-extension.SaveFile",
+				"key": "ctrl+alt+t",
+				"mac": "shift+option+T",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "power-bi-thems-extension.Visualize",
+				"key": "ctrl+alt+V",
+				"mac": "shift+option+T"
+			}
+		]
 	},
 	"scripts": {
 		"lint": "eslint .",

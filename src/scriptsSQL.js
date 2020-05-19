@@ -46,7 +46,8 @@ const addTag = "INSERT INTO file_tag_current (id_file_current, id_tag_current) V
   "INSERT INTO file_tag_version SELECT ftv.id_tag_version, @new_id_file FROM file_tag_version ftv WHERE ftv.id_file_version = @id_last_version_file " +
   "INSERT INTO file_tag_version (id_tag_version, id_file_version) VALUES (@id_last_version_tag, @new_id_file)"
 
-const removeTag = "DELETE FROM file_tag_current WHERE id_file_current = @id_file AND id_tag_current = @id_tag"
+const removeTag = "DELETE FROM file_tag_current WHERE id_file_current = @id_file AND id_tag_current = @id_tag "
+
 
 const createFile = "DECLARE @new_id_file UNIQUEIDENTIFIER " +
   "SET @new_id_file = NEWID() " +
@@ -56,7 +57,9 @@ const createFile = "DECLARE @new_id_file UNIQUEIDENTIFIER " +
   "VALUES (NEWID(), @new_id_file, USER_ID(@user), @user, @name, @data, GETDATE(),GETDATE()) " +
   "SELECT @new_id_file, GETDATE(), @name"
 
-const saveFile = "DECLARE @new_id UNIQUEIDENTIFIER " +
+const saveFile =  "DECLARE @id_last_version UNIQUEIDENTIFIER; " +
+  "SELECT @id_last_version = id FROM file_version WHERE id_file_current = @id AND date_update = (SELECT MAX(date_update) FROM file_version WHERE id_file_current = @id); " +
+  "DECLARE @new_id UNIQUEIDENTIFIER " +
   "SET @new_id = NEWID() " +
   "DECLARE @data NVARCHAR(MAX) " +
   "DECLARE @name NVARCHAR(MAX) " +
@@ -64,12 +67,10 @@ const saveFile = "DECLARE @new_id UNIQUEIDENTIFIER " +
   "SELECT @data = data, @name = name, @data_creation = date_creation FROM file_current WHERE id = @id " +
   "INSERT INTO file_version (id, id_file_current, userID, userName, name, data, date_creation, date_update) " +
   "VALUES (@new_id, @id, USER_ID(@user), @user, @name, @data, @data_creation, GETDATE()) " +
-  "DECLARE @id_last_version UNIQUEIDENTIFIER; " +
-  "SELECT @id_last_version = id FROM file_version WHERE id_file_current = @id AND date_update = (SELECT MAX(date_update) FROM file_version WHERE id_file_current = @id); " +
   "INSERT INTO file_tag_version SELECT id_tag_version, @new_id FROM file_tag_version WHERE id_file_version = @id_last_version " +
   "UPDATE file_current SET name = @new_name, data = @new_data, userId = USER_ID(@user), userName= @user, date_update = getdate() WHERE id = @id;"
 
-const deleFile = "DECLARE @new_id UNIQUEIDENTIFIER " +
+const deletFile = "DECLARE @new_id UNIQUEIDENTIFIER " +
   "SET @new_id = NEWID() " +
   "DECLARE @data NVARCHAR(MAX) " +
   "DECLARE @name NVARCHAR(MAX) " +
@@ -88,6 +89,23 @@ const getTagsFile = "SELECT tc.name FROM tag_current tc JOIN file_tag_current ft
 
 const getFileInformation = "SELECT name, userName, date_update FROM file_current where id = @id"
 
+const getFileVersion = "SELECT date_update, id, data FROM file_version fv WHERE fv.id_file_current = @id"
+
+const getTagsFileVersion = "DECLARE @name NVARCHAR(MAX); " +
+"DECLARE @data NVARCHAR(MAX); " +
+"SELECT @name = name, @data = data FROM file_version WHERE id = @id_version; " +
+"UPDATE file_current " +
+  "SET name = @name, data = @data, userId = USER_ID(@user), userName = @user, date_update = GETDATE() " +
+  "WHERE id = @id_file; " +
+"DELETE FROM file_tag_current WHERE id_file_current = @id_file " +
+"INSERT INTO file_tag_current SELECT DISTINCT @id_file, tv.id_tag_current " +
+  "FROM file_tag_version ftv JOIN tag_version tv ON tv.id = ftv.id_tag_version " + 
+  "WHERE ftv.id_file_version = @id_version " +
+  "SELECT DISTINCT  tc.name " + 
+ " FROM file_tag_version ftv JOIN tag_version tv ON tv.id = ftv.id_tag_version JOIN tag_current tc ON tv.id_tag_current = tc.id " +
+"  WHERE ftv.id_file_version = @id_version "
+
+
 exports.createTag = createTag
 exports.renameTag = renameTag
 exports.getTags = getTags
@@ -96,10 +114,12 @@ exports.addTag = addTag
 exports.removeTag = removeTag
 exports.saveFile = saveFile
 exports.createFile = createFile
-exports.deleFile = deleFile
+exports.deletFile = deletFile
 exports.getFile = getFile
 exports.getTagsFile = getTagsFile
 exports.getFileInformation = getFileInformation
+exports.getFileVersion = getFileVersion
+exports.getTagsFileVersion = getTagsFileVersion
 
 module.export = {
   createTag,
@@ -110,8 +130,10 @@ module.export = {
   removeTag,
   saveFile,
   createFile,
-  deleFile,
+  deletFile,
   getFile,
   getTagsFile,
-  getFileInformation
+  getFileInformation,
+  getFileVersion,
+  getTagsFileVersion
 }

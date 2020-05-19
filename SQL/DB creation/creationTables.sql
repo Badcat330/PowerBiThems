@@ -61,8 +61,8 @@ ADD CONSTRAINT FK_file_version_id_file_current FOREIGN KEY (id_file_current) REF
 GO
 
 CREATE TABLE themes.dbo.file_tag_current (
-  id_file_current UNIQUEIDENTIFIER NULL
- ,id_tag_current UNIQUEIDENTIFIER NULL
+  id_file_current UNIQUEIDENTIFIER NOT NULL
+ ,id_tag_current UNIQUEIDENTIFIER NOT NULL
 ) ON [PRIMARY]
 GO
 
@@ -75,8 +75,8 @@ ADD CONSTRAINT FK_file_tag_id_tag FOREIGN KEY (id_tag_current) REFERENCES dbo.ta
 GO
 
 CREATE TABLE themes.dbo.file_tag_version (
-  id_tag_version UNIQUEIDENTIFIER NULL
- ,id_file_version UNIQUEIDENTIFIER NULL
+  id_tag_version UNIQUEIDENTIFIER NOT NULL
+ ,id_file_version UNIQUEIDENTIFIER NOT NULL
 ) ON [PRIMARY]
 GO
 
