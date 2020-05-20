@@ -1,6 +1,6 @@
 # PowerBI Styling and Branding (BIS)
 
-This is extension for managing Power BI styles.
+This is extension for managing [Microsoft Power BI](https://powerbi.microsoft.com/)  styles.
 
 ## Features
 
