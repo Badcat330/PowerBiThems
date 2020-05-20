@@ -75,99 +75,104 @@ function activate(context) {
 			dbConnector.deleteFile(editor)
 		})
 
-	let downloadFile = vscode.commands.registerCommand("power-bi-thems-extension.DownloadFile", async function(){
+	let downloadFile = vscode.commands.registerCommand("power-bi-thems-extension.DownloadFile", async function () {
 		dbConnector.downloadFile()
 	})
 
 	let showFileInformation = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.ShowFileInformation",
-	async function (editor) {
-		dbConnector.getInformationFromFile(editor)
-	})
+		async function (editor) {
+			dbConnector.getInformationFromFile(editor)
+		})
 
 	let backToFileVersion = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.BackFileVersion",
-	async function(editor){
-		dbConnector.backToVersionFile(editor)
-	})
+		async function (editor) {
+			dbConnector.backToVersionFile(editor)
+		})
 
-	let changeMetadata = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.changeMetadata", async function (editor, edit) {
-		const text = editor.document.getText()
-		var style = JSON.parse(text)
-		if (!style.hasOwnProperty("visualStyles")) {
-			style["visualStyles"] = {
-				"[18FA64C3-45E0-488A-ADB7-A4D37842CB93]": dbConnector.metadata
-			};
-		}
-		else {
-			style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"] = dbConnector.metadata
-		}
-		const newText = JSON.stringify(style, null, '\t')
-		var firstLine = editor.document.lineAt(0);
-		var lastLine = editor.document.lineAt(editor.document.lineCount - 1);
-		var textRange = new vscode.Range(0,
-			firstLine.range.start.character,
-			editor.document.lineCount - 1,
-			lastLine.range.end.character);
-		edit.replace(textRange, newText)
-	})
+	let changeMetadata = vscode.commands.registerTextEditorCommand("power-bi-thems-extension.changeMetadata",
+		async function (editor, edit) {
+			const text = editor.document.getText()
+			var style = JSON.parse(text)
+			if (!style.hasOwnProperty("visualStyles")) {
+				style["visualStyles"] = {
+					"[18FA64C3-45E0-488A-ADB7-A4D37842CB93]": dbConnector.metadata
+				};
+			}
+			else {
+				style.visualStyles["[18FA64C3-45E0-488A-ADB7-A4D37842CB93]"] = dbConnector.metadata
+			}
+			const newText = JSON.stringify(style, null, '\t')
+			var firstLine = editor.document.lineAt(0);
+			var lastLine = editor.document.lineAt(editor.document.lineCount - 1);
+			var textRange = new vscode.Range(0,
+				firstLine.range.start.character,
+				editor.document.lineCount - 1,
+				lastLine.range.end.character);
+			edit.replace(textRange, newText)
+		})
 
-	let visualize = vscode.commands.registerCommand("power-bi-thems-extension.Visualize", async function () {
-		let normativePath = vscode.workspace.getConfiguration('power-bi-thems-extension').get("NormativeTestPath")
-		let customPath = vscode.workspace.getConfiguration('power-bi-thems-extension').get("CustomTestPath")
+	let visualize = vscode.commands.registerCommand("power-bi-thems-extension.Visualize",
+		async function () {
+			let normativePath = vscode.workspace.getConfiguration('power-bi-thems-extension')
+				.get("NormativeTestPath")
+			let customPath = vscode.workspace.getConfiguration('power-bi-thems-extension')
+				.get("CustomTestPath")
 
-		let customPathFlag = false
-		let normativePathFlag = false
-		
-		let answer = await vscode.window.showQuickPick(["Normative", "Custom", "Both"], {placeHolder : "What test do you like to open?"})
+			let customPathFlag = false
+			let normativePathFlag = false
 
-		if(answer == "Normative")
-			normativePathFlag = true
-		if(answer == "Custom")
-			customPathFlag = true
-		if(answer == "Both"){
-			normativePathFlag = true
-			customPathFlag = true
-		}
+			let answer = await vscode.window.showQuickPick(["Normative", "Custom", "Both"],
+				{ placeHolder: "What test do you like to open?" })
 
-		if(customPathFlag){
-			if(customPath == ""){
-				var inputPath = await vscode.window.showOpenDialog({
-					filters: {
-						"Power BI": ['pbix']
-					},
-					openLabel: "Open custom test"
-				})
-
-				customPath = inputPath[0].path.substring(1, inputPath[0].path.length)
+			if (answer == "Normative")
+				normativePathFlag = true
+			if (answer == "Custom")
+				customPathFlag = true
+			if (answer == "Both") {
+				normativePathFlag = true
+				customPathFlag = true
 			}
 
-			cp.exec('"' + customPath + '"', function (err) {
-				if (err) {
-					console.log(err)
-					vscode.window.showErrorMessage("Something wrong with your custom path, try again.")
+			if (customPathFlag) {
+				if (customPath == "") {
+					var inputPath = await vscode.window.showOpenDialog({
+						filters: {
+							"Power BI": ['pbix']
+						},
+						openLabel: "Open custom test"
+					})
+
+					customPath = inputPath[0].path.substring(1, inputPath[0].path.length)
 				}
-			})
-		}
 
-		if(normativePathFlag){
-			if(normativePath == ""){
-				var inputPath = await vscode.window.showOpenDialog({
-					filters: {
-						"Power BI": ['pbix']
-					},
-					openLabel: "Open normative test"
+				cp.exec('"' + customPath + '"', function (err) {
+					if (err) {
+						console.log(err)
+						vscode.window.showErrorMessage("Something wrong with your custom path, try again.")
+					}
 				})
-
-				normativePath = inputPath[0].path.substring(1, inputPath[0].path.length)
 			}
 
-			cp.exec('"' + normativePath + '"', function (err) {
-				if (err) {
-					console.log(err)
-					vscode.window.showErrorMessage("Something wrong with your normative path, try again.")
+			if (normativePathFlag) {
+				if (normativePath == "") {
+					var inputPath = await vscode.window.showOpenDialog({
+						filters: {
+							"Power BI": ['pbix']
+						},
+						openLabel: "Open normative test"
+					})
+
+					normativePath = inputPath[0].path.substring(1, inputPath[0].path.length)
 				}
-			})
-		}
-	});
+
+				cp.exec('"' + normativePath + '"', function (err) {
+					if (err) {
+						console.log(err)
+						vscode.window.showErrorMessage("Something wrong with your normative path, try again.")
+					}
+				})
+			}
+		});
 
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(connect)
